@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fat Hippo Weekly Site Report</title>
+<style>
+  :root{ color-scheme: light; }
+
+  :root{
+    --bg:#0a0a0a;
+    --panel:#161616;
+    --panel-alt:#1e1e1e;
+    --panel-border:#2b2b2b;
+    --mint:#2fe6a6;
+    --mint-dim:rgba(47,230,166,0.14);
+    --text:#f4f4f4;
+    --text-dim:#9c9c9c;
+    --red:#ff6161;
+    --red-dim:rgba(255,97,97,0.14);
+    --amber:#ffb84d;
+    --amber-dim:rgba(255,184,77,0.14);
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;padding:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+    font-size:13px;
+    line-height:1.5;
+  }
+
+  #app{
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse 900px 300px at 15% -10%, rgba(47,230,166,0.08), transparent 60%),
+      var(--bg);
+    padding-bottom:60px;
+  }
+
+  header{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:22px 28px 18px 28px;
+    border-bottom:1px solid var(--panel-border);
+    flex-wrap:wrap;
+  }
+
+  .logo-mark{ flex-shrink:0; }
+
+  .title-block{ flex:1; min-width:260px; }
+
+  h1.brand{
+    font-family: Arial, "Helvetica Neue", sans-serif;
+    font-weight:900;
+    letter-spacing:0.5px;
+    font-size:30px;
+    margin:0;
+    color:#fff;
+    text-transform:uppercase;
+    text-shadow: 1px 1px 0 rgba(47,230,166,0.35), -1px -1px 0 rgba(255,255,255,0.05);
+  }
+
+  .subtitle{
+    margin-top:4px;
+    color:var(--mint);
+    font-size:13px;
+    letter-spacing:0.5px;
+  }
+
+  .subtitle .muted{ color:var(--text-dim); }
+
+  .status-pill{
+    margin-left:auto;
+    font-size:11px;
+    color:var(--text-dim);
+    border:1px solid var(--panel-border);
+    border-radius:20px;
+    padding:6px 14px;
+    background:var(--panel);
+    white-space:nowrap;
+  }
+
+  .status-pill.live::before{
+    content:"";
+    display:inline-block;
+    width:7px;height:7px;
+    border-radius:50%;
+    background:var(--mint);
+    margin-right:7px;
+    box-shadow:0 0 6px var(--mint);
+  }
+
+  nav#tabs{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding:14px 28px;
+    border-bottom:1px solid var(--panel-border);
+    background:#0d0d0d;
+    scrollbar-width:thin;
+  }
+  nav#tabs::-webkit-scrollbar{height:6px;}
+  nav#tabs::-webkit-scrollbar-thumb{background:var(--panel-border); border-radius:4px;}
+
+  .tab-btn{
+    flex-shrink:0;
+    background:var(--panel);
+    color:var(--text-dim);
+    border:1px solid var(--panel-border);
+    border-radius:8px;
+    padding:8px 16px;
+    font-family:inherit;
+    font-size:12px;
+    letter-spacing:0.4px;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .tab-btn:hover{ color:#fff; border-color:var(--mint); }
+  .tab-btn.active{
+    background:var(--mint-dim);
+    color:var(--mint);
+    border-color:var(--mint);
+    font-weight:700;
+  }
+  .tab-btn.group-tab{ font-weight:700; }
+
+  main{ padding:26px 28px; }
+
+  .panel{ display:none; animation:fadein .2s ease; }
+  .panel.active{ display:block; }
+  @keyframes fadein{ from{opacity:0;} to{opacity:1;} }
+
+  .section{
+    margin-bottom:30px;
+  }
+
+  .section-title{
+    font-size:11px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .section-title::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--panel-border);
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
+    gap:12px;
+  }
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:10px;
+    padding:16px 18px;
+  }
+
+  .card .label{
+    font-size:10.5px;
+    color:var(--text-dim);
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    margin-bottom:8px;
+  }
+
+  .card .value{
+    font-size:22px;
+    font-weight:700;
+    color:#fff;
+  }
+
+  .card .value.mint{ color:var(--mint); }
+  .card .value.red{ color:var(--red); }
+  .card .value.amber{ color:var(--amber); }
+
+  .stat-card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+    gap:12px;
+  }
+  .stat-card{
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:10px;
+    padding:14px 16px;
+  }
+  .stat-card .stat-name{
+    font-weight:700;
+    color:#fff;
+    font-size:13px;
+    margin-bottom:8px;
+  }
+  .stat-card .stat-row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    font-size:11.5px;
+    padding:4px 0;
+    border-top:1px solid var(--panel-border);
+  }
+  .stat-card .stat-row:first-of-type{ border-top:none; }
+  .stat-card .stat-label{ color:var(--text-dim); }
+  .stat-card .stat-value{ color:var(--text); font-variant-numeric:tabular-nums; }
+
+  .card .delta{
+    margin-top:6px;
+    font-size:11.5px;
+  }
+  .delta.pos{ color:var(--mint); }
+  .delta.neg{ color:var(--red); }
+  .delta.flat{ color:var(--text-dim); }
+
+  .card .rag-caption{
+    margin-top:6px;
+    font-size:10.5px;
+    color:var(--text-dim);
+  }
+
+  .card.rag-good{
+    border-color:rgba(47,230,166,0.55);
+    background:linear-gradient(180deg, rgba(47,230,166,0.10), var(--panel) 70%);
+  }
+  .card.rag-good .value{ color:var(--mint); }
+
+  .card.rag-bad{
+    border-color:rgba(255,97,97,0.6);
+    background:linear-gradient(180deg, rgba(255,97,97,0.10), var(--panel) 70%);
+  }
+  .card.rag-bad .value{ color:var(--red); }
+
+  .section-subtitle{
+    font-size:11px;
+    color:var(--text-dim);
+    margin:-6px 0 12px 0;
+  }
+
+  .review-card{
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:10px;
+    padding:14px 16px;
+    margin-bottom:10px;
+  }
+  .review-card.negative{
+    border-color:rgba(255,97,97,0.55);
+    background:linear-gradient(180deg, rgba(255,97,97,0.08), var(--panel) 60%);
+  }
+  .review-meta{
+    font-size:11px;
+    color:var(--text-dim);
+    margin-bottom:8px;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .review-meta b{ color:#fff; }
+  .platform-badge{
+    display:inline-block;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    padding:2px 8px;
+    border-radius:20px;
+    background:var(--panel-alt);
+    border:1px solid var(--panel-border);
+    color:var(--text-dim);
+  }
+  .stars{ color:var(--amber); letter-spacing:1px; }
+  .review-text{ font-size:12.5px; color:#e9e9e9; line-height:1.5; }
+  .no-reviews{ color:var(--text-dim); font-style:italic; padding:10px 4px; }
+
+  table.gh{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+  }
+  table.gh th{
+    text-align:left;
+    color:var(--text-dim);
+    font-weight:600;
+    text-transform:uppercase;
+    font-size:10px;
+    letter-spacing:0.5px;
+    padding:8px 10px;
+    border-bottom:1px solid var(--panel-border);
+  }
+  table.gh td{
+    padding:9px 10px;
+    border-bottom:1px solid #1c1c1c;
+    color:var(--text);
+  }
+  table.gh tbody tr:hover{ background:#191919; }
+  table.gh td.num{ text-align:right; font-variant-numeric:tabular-nums; }
+
+  .info-box{
+    background:var(--panel-alt);
+    border:1px dashed var(--panel-border);
+    border-radius:10px;
+    padding:16px 18px;
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+  }
+  .info-box .dot{
+    flex-shrink:0;
+    width:20px;height:20px;
+    border-radius:50%;
+    background:var(--mint);
+    color:#00251a;
+    font-weight:900;
+    font-size:12px;
+    display:flex;align-items:center;justify-content:center;
+    margin-top:2px;
+  }
+
+  .log-entry{
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:10px;
+    padding:14px 16px;
+    margin-bottom:10px;
+  }
+  .log-entry .log-meta{
+    font-size:11px;
+    color:var(--text-dim);
+    margin-bottom:8px;
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .log-entry .log-meta b{ color:var(--mint); }
+  .log-field{ margin-bottom:6px; font-size:12.5px; }
+  .log-field .fname{ color:var(--text-dim); }
+
+  .no-logs{
+    color:var(--text-dim);
+    font-style:italic;
+    padding:14px 4px;
+  }
+
+  .summary-box{
+    background:linear-gradient(135deg, rgba(47,230,166,0.07), rgba(47,230,166,0.01));
+    border:1px solid var(--mint);
+    border-radius:10px;
+    padding:18px 20px;
+    font-size:13px;
+    line-height:1.7;
+    color:#e9e9e9;
+  }
+  .summary-box b{ color:var(--mint); }
+
+  .loading{
+    padding:80px 20px;
+    text-align:center;
+    color:var(--text-dim);
+  }
+  .loading .spinner{
+    width:28px;height:28px;
+    border-radius:50%;
+    border:3px solid var(--panel-border);
+    border-top-color:var(--mint);
+    margin:0 auto 16px auto;
+    animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .err-banner{
+    background:var(--red-dim);
+    border:1px solid var(--red);
+    color:#ffb3b3;
+    padding:10px 14px;
+    border-radius:8px;
+    font-size:12px;
+    margin-bottom:18px;
+  }
+
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb{ background:#2b2b2b; border-radius:4px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div style="background:#3a2a00;color:#ffd679;padding:10px 20px;font-size:13px;text-align:center;border-bottom:2px solid #ffb300;">
+    <b>Static snapshot</b> — captured 15 July 2026, reflects the week of 6&ndash;12 July 2026 (Month To Date figures cover 1&ndash;14 July 2026). This is a frozen, point-in-time copy — it will not refresh and does not connect to Tenzo. Two simplifications vs. the live dashboard: category/product-level wastage breakdown and the Month To Date purchase category split are not included (totals are still real Tenzo data).
+  </div>
+
+  <header>
+    <svg class="logo-mark" width="72" height="52" viewBox="0 0 210 130" xmlns="http://www.w3.org/2000/svg">
+      <g fill="#ffffff">
+        <ellipse cx="118" cy="58" rx="72" ry="42"/>
+        <ellipse cx="40" cy="64" rx="32" ry="28"/>
+        <ellipse cx="22" cy="36" rx="9" ry="11"/>
+        <ellipse cx="188" cy="52" rx="9" ry="7"/>
+        <rect x="48" y="88" width="17" height="30" rx="8"/>
+        <rect x="82" y="92" width="17" height="30" rx="8"/>
+        <rect x="128" y="92" width="17" height="30" rx="8"/>
+        <rect x="160" y="88" width="17" height="30" rx="8"/>
+      </g>
+      <text x="118" y="52" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="24" fill="#0a0a0a" letter-spacing="1">FAT</text>
+      <text x="118" y="76" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="24" fill="#0a0a0a" letter-spacing="1">HIPPO</text>
+    </svg>
+    <div class="title-block">
+      <h1 class="brand">Fat Hippo Weekly Site Report</h1>
+      <div class="subtitle" id="week-subtitle">Loading week period&hellip;</div>
+    </div>
+    <div class="status-pill live" id="status-pill">Connecting to Tenzo&hellip;</div>
+  </header>
+
+  <nav id="tabs"><div class="loading" style="padding:8px 20px;color:#666;">building tabs&hellip;</div></nav>
+
+  <main id="content">
+    <div class="loading">
+      <div class="spinner"></div>
+      Pulling last week's figures from Tenzo across all Fat Hippo sites&hellip;
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gridjs@5.0.2/dist/gridjs.umd.js" integrity="sha384-/XXDzxe4FsGiAe50i/u9pY/Vy/uX654MHB1xoc1BJNnH1WXHhqHga9g3q5tF4gj7" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridjs@5.0.2/dist/theme/mermaid.min.css">
+
+<script>
+const STATIC_CAPTURED_LABEL = '15 Jul 2026, 18:52';
+const STATIC_DATA = {"ctx":{"business_id":1052,"business_name":"Fat Hippo","id":11190,"email":"dickie@fathippo.co.uk","currency":"GBP","timezone":"Europe/London","start_day_of_week":"Monday","date_periods":{"Today":{"startDate":"2026-07-15","endDate":"2026-07-15","code":"Today"},"Month To Date":{"startDate":"2026-07-01","endDate":"2026-07-14","code":"MTD"},"Quarter To Date":{"startDate":"2026-07-01","endDate":"2026-07-14","code":"QTD"},"Year To Date":{"startDate":"2026-01-01","endDate":"2026-07-14","code":"YTD"}}},"locs":{"business_id":1052,"count":12,"results":[{"name":"Glasgow"},{"name":"Newcastle (Jesmond)"},{"name":"Nottingham"},{"name":"Cardiff"},{"name":"Birmingham"},{"name":"Leeds (Headingley)"},{"name":"Liverpool"},{"name":"Durham"},{"name":"Newcastle (Centre)"},{"name":"York"},{"name":"Edinburgh"},{"name":"Leeds"}]},"logs":{"results":[{"location_name":"Newcastle (Centre)","logbook_name":"EOD Shift Report","author":"jamie@fathippo.co.uk","date_of_business":"2026-07-10","full_text":{"full_text":[{"section_name":"In House","section_content":[{"field_name":"Average ticket times?","field_value":"30 mins"},{"field_name":"Any discounts or comps?","field_value":"None"},{"field_name":"Any drink or food complaints?","field_value":"None"}]},{"section_name":"Delivery platforms","section_content":[{"field_name":"Any issues to report?","field_value":"Fowl play slow to collect"},{"field_name":"Was busy mode used?","field_value":"Yes. For about 45 mins"},{"field_name":"Were any tablets switched off at any point?","field_value":"No"}]},{"section_name":"People","section_content":[{"field_name":"Any absences, lateness, issues to report?","field_value":"Yuito late"}]},{"section_name":"Handover","section_content":[{"field_name":"Any other business","field_value":"None"}]}]}},{"location_name":"Newcastle (Centre)","logbook_name":"EOD Shift Report","author":"jamie@fathippo.co.uk","date_of_business":"2026-07-08","full_text":{"full_text":[{"section_name":"In House","section_content":[{"field_name":"Average ticket times?","field_value":"35 mins"},{"field_name":"Any discounts or comps?","field_value":"Student beans"},{"field_name":"Any drink or food complaints?","field_value":"Screw in beef"}]},{"section_name":"Delivery platforms","section_content":[{"field_name":"Any issues to report?","field_value":"None"},{"field_name":"Was busy mode used?","field_value":"For about 30 mins"},{"field_name":"Were any tablets switched off at any point?","field_value":"No"}]},{"section_name":"People","section_content":[{"field_name":"Any absences, lateness, issues to report?","field_value":"None"}]},{"section_name":"Handover","section_content":[{"field_name":"Any other business","field_value":"None"}]}]}}]},"reviews":{"count":14,"next":null,"results":[{"location_name":"Glasgow","source":"Google My Business","rating":3,"name":"ANU SASIDHARAN","text":"One of the best burger places I've tried. Fresh, tasty food and excellent service.","review_datetime":"2026-07-10T22:41:53.018574Z"},{"location_name":"Nottingham","source":"Tripadvisor V3","rating":1,"name":"fredsP7038VB","text":"Foreign object in food. We've ordered from here multiple times in the past and had generally good experiences, which makes our most recent order even more disappointing.\n\nWhen I started eating my burger, I found a long red hair inside it. I immediately called the restaurant to report the issue, but no replacement or refund was offered. Instead, I was told to contact Deliveroo. When I spoke to Deliveroo, they advised that the restaurant needed to resolve the matter directly and they were not able to help.\n\nI then emailed the restaurant, including a photograph of the foreign object in the food, but I never received a response.. \nFinding a foreign object in your food is bad enough, and shows a lack of hygiene precautions in the kitchen, the lack of customer service in resolving the issue was even more disappointing and means we don’t feel safe ordering from here again. It’s annoying as we enjoyed the food before it happened.","review_datetime":"2026-07-10T11:09:37Z"},{"location_name":"Cardiff","source":"Google My Business","rating":3,"name":"G H","text":"Food was amazing, Fat Hippo burger was so nice. Service was slow. 3 other tables, so not busy. The staff were lovely just not in a rush.","review_datetime":"2026-07-09T19:55:28.360395Z"},{"location_name":"Cardiff","source":"Google My Business","rating":1,"name":"Rubie Williams","text":"we went here and got takeaway burgers as we had seen this place on social media with really good reviews unfortunately when i took a bite into my chicken burger it was raw inside","review_datetime":"2026-07-10T16:11:02.675261Z"},{"location_name":"Birmingham","source":"Google My Business","rating":3,"name":"Bethany Farnfield","text":"The food was great. The manager however was rude to all the customers leaving dirty plates on tables whilst she was behind the bar just restocking fridges. She was being nasty to the waitress.  The waitress was the only one doing all the work (she deserves a promotion).","review_datetime":"2026-07-08T20:18:48.499939Z"},{"location_name":"Birmingham","source":"Google My Business","rating":2,"name":"K C.","text":"Fat Hippo (me) came to Fat Hippo today, Fat Hippo did not like Fat Hippo.\n\nExpectations were high, 4.7/5 on Google Maps, clearly I was wrong, but it was takeaway anyways so fair enough.\n\nFood is all that matters in a restaurant, so let’s just focus on that today.\n\nOrdered a Fat Hippo Burger, I loved the sweet and crispy battered onions and the soft buttery brioche bun but what’s good about a burger if the patty’s the worst part?\n\nI tried to like it I really did. I hate lamb because I never got over its gamey taste as a kid, oddly enough this burger took me back to my childhood aeughs. I thought it was advertised as a beef burger but why would it taste like very gamey lamb? I’ve never experienced this ever in my life. Smelled really good though. If only it tasted as good as it smelled.\n\nHad the Semi Parmed Chicken Burger as well, you would love it if you like pickles and celery, it was doused with so much celery powder it made a salad feel insecure. Chicken was well crisp, but the seasoning on the fried chicken was nowhere to be found. Really a hit or miss, reading so many wonderful reviews, but I guess just not my cup of tea. Where’s the garlic?\n\nChips were nice but I reckon they would taste much better eating in so it comes crispy and nice and fresh.\n\nI rarely ever write reviews like these, but please just take my suggestions as constructive ones rather than critical ones.","review_datetime":"2026-07-08T19:11:24.571729Z"},{"location_name":"Birmingham","source":"Google My Business","rating":1,"name":"Christine Lorbiecki","text":"Beware: although this gets good reviews for being child friendly, we were turned away with our 12-week-old when we tried to get a table for dinner because “we don’t allow under 18s after 8pm”. I cannot find this rule on their website. I don’t want to be pedantic but it was 7:40pm and we aren’t the type of parents to be giving alcohol to our infant…\n\nCan confirm that the well known pizza place across the street IS baby friendly and we happily gave them our business instead.","review_datetime":"2026-07-09T08:35:54.334684Z"},{"location_name":"Liverpool","source":"Google My Business","rating":3,"name":"Joanne Stuart","text":"Finished meal. Two drinking their drinks still. Given bill no rush needed told. 5 mins later at table again card machine brought over asking how do we want to do the bill? We had 30 minutes left on our booking but felt pushed out. Paid and left. Would not return. Food medioca,  ranch was not ranch tasted like riata.","review_datetime":"2026-07-07T07:12:30.036346Z"},{"location_name":"Liverpool","source":"Google My Business","rating":1,"name":"Matt Smith","text":"Staff should be allowed to wear shorts during a heatwave. Food was mid for the price. 10/10 service but rest was a let down","review_datetime":"2026-07-10T19:30:49.609910Z"},{"location_name":"Durham","source":"Tripadvisor V3","rating":2,"name":"ChrisA952","text":"Not worth complaining, just won't go back !. Lunch time treat as my partner was in the mood for a proper burger, we ordered a burger each and a side of onion rings, think we ordered wrong as the patty was not a chunky as we'd hopped, the fries were very crispy, very thin and very heavily seasoned, as for the onion rings...very greasy sitting in a pool of fat, 5 rings in total, 3 very overdone and two with raw batter in places, very under done, we only managed one each due to the oil/fat. We did complain and they were very apologetic, but when the bill came they still charger the £4.50 for the onion rings, I questioned the waitress asking are you still charging for the onion rings, who replied yes, I am afraid so.","review_datetime":"2026-07-07T07:02:47Z"},{"location_name":"Newcastle (Centre)","source":"Google My Business","rating":2,"name":"Peter Burnett","text":"When we were in it was quiet, but still felt cramped, would hate to be in it when it's full, food was OK, burgers were nothing specially, some of the sides look interesting, onion rings were huge but very greasy will not go back, apparently burgers are specially prepared by their butcher which probably  means frozen. Disappointing  visit","review_datetime":"2026-07-11T17:44:36.823222Z"},{"location_name":"York","source":"Google My Business","rating":3,"name":"Jethro Martin","text":"Average burger at best. Went to the one in Leeds, which was bad, but this isn’t much better","review_datetime":"2026-07-10T18:29:56.413551Z"},{"location_name":"Edinburgh","source":"Google My Business","rating":1,"name":"Mohammad Aswad","text":"The worst experience I’ve seen, food not tasty, coleslaw very bad , burger so bad and not cheap\n\nI don’t like it.","review_datetime":"2026-07-12T18:45:30.368101Z"},{"location_name":"Edinburgh","source":"Google My Business","rating":1,"name":"LDHR CEO Dr.Mahmoud Aswad","text":"Not delicious at all","review_datetime":"2026-07-12T18:48:52.118660Z"}]},"metrics":{"sales|2026-07-06|2026-07-12|[\"location\"]":{"data":[{"poslocation__app_location__name":"Newcastle (Centre)","sales":31025.450641},{"poslocation__app_location__name":"Leeds (Headingley)","sales":11027.778485},{"poslocation__app_location__name":"Birmingham","sales":20201.526026},{"poslocation__app_location__name":"York","sales":29811.456957},{"poslocation__app_location__name":"Nottingham","sales":17679.942672},{"poslocation__app_location__name":"Leeds","sales":23254.731929},{"poslocation__app_location__name":"Durham","sales":20840.068879},{"poslocation__app_location__name":"Edinburgh","sales":32248.822398},{"poslocation__app_location__name":"Glasgow","sales":27233.789107},{"poslocation__app_location__name":"Liverpool","sales":16351.816522},{"poslocation__app_location__name":"Newcastle (Jesmond)","sales":26394.468764},{"poslocation__app_location__name":"Cardiff","sales":22020.546222}]},"sales|2026-06-29|2026-07-05|[\"location\"]":{"data":[{"poslocation__app_location__name":"Newcastle (Centre)","sales":27381.554488},{"poslocation__app_location__name":"Leeds (Headingley)","sales":15994.159401},{"poslocation__app_location__name":"Birmingham","sales":21971.215281},{"poslocation__app_location__name":"York","sales":33044.296135},{"poslocation__app_location__name":"Nottingham","sales":20265.277186},{"poslocation__app_location__name":"Leeds","sales":27162.411653},{"poslocation__app_location__name":"Durham","sales":24291.935532},{"poslocation__app_location__name":"Edinburgh","sales":27147.922424},{"poslocation__app_location__name":"Glasgow","sales":31742.178327},{"poslocation__app_location__name":"Liverpool","sales":20358.965307},{"poslocation__app_location__name":"Newcastle (Jesmond)","sales":25465.846167},{"poslocation__app_location__name":"Cardiff","sales":29714.197792}]},"sales|2025-07-07|2025-07-13|[\"location\"]":{"data":[{"poslocation__app_location__name":"Birmingham","sales":22948.774714},{"poslocation__app_location__name":"Cardiff","sales":34971.58296},{"poslocation__app_location__name":"Durham","sales":23977.199735},{"poslocation__app_location__name":"Edinburgh","sales":21711.199818},{"poslocation__app_location__name":"Glasgow","sales":22878.716371},{"poslocation__app_location__name":"Leeds (Headingley)","sales":13880.583128},{"poslocation__app_location__name":"Liverpool","sales":15004.049827},{"poslocation__app_location__name":"Newcastle (Centre)","sales":26954.874677},{"poslocation__app_location__name":"Newcastle (Jesmond)","sales":17465.806404},{"poslocation__app_location__name":"Nottingham","sales":18274.483106},{"poslocation__app_location__name":"York","sales":27024.874697}]},"sales|2026-07-01|2026-07-14|[\"location\"]":{"data":[{"poslocation__app_location__name":"Newcastle (Centre)","sales":59929.652728},{"poslocation__app_location__name":"Leeds (Headingley)","sales":26317.823611},{"poslocation__app_location__name":"Birmingham","sales":40873.466333},{"poslocation__app_location__name":"York","sales":62480.954306},{"poslocation__app_location__name":"Nottingham","sales":37272.255586},{"poslocation__app_location__name":"Leeds","sales":49739.853141},{"poslocation__app_location__name":"Durham","sales":43033.454445},{"poslocation__app_location__name":"Edinburgh","sales":60273.625819},{"poslocation__app_location__name":"Glasgow","sales":56155.628167},{"poslocation__app_location__name":"Liverpool","sales":34257.680637},{"poslocation__app_location__name":"Newcastle (Jesmond)","sales":51031.662555},{"poslocation__app_location__name":"Cardiff","sales":47874.229294}]},"forecast_sales|2026-07-06|2026-07-12|[\"location\"]":{"data":[{"location__name":"Birmingham","forecast_sales":20077.17224},{"location__name":"Cardiff","forecast_sales":26000},{"location__name":"Durham","forecast_sales":30950},{"location__name":"Edinburgh","forecast_sales":28300},{"location__name":"Glasgow","forecast_sales":25400},{"location__name":"Leeds","forecast_sales":24500},{"location__name":"Leeds (Headingley)","forecast_sales":13200},{"location__name":"Liverpool","forecast_sales":18605.755982},{"location__name":"Newcastle (Centre)","forecast_sales":25500},{"location__name":"Newcastle (Jesmond)","forecast_sales":22400},{"location__name":"Nottingham","forecast_sales":21250},{"location__name":"York","forecast_sales":30000}]},"forecast_sales|2026-07-13|2026-07-19|[\"location\"]":{"data":[{"location__name":"Birmingham","forecast_sales":19965.495605},{"location__name":"Cardiff","forecast_sales":23500},{"location__name":"Durham","forecast_sales":27650},{"location__name":"Edinburgh","forecast_sales":28000},{"location__name":"Glasgow","forecast_sales":27700},{"location__name":"Leeds","forecast_sales":30000},{"location__name":"Leeds (Headingley)","forecast_sales":15250},{"location__name":"Liverpool","forecast_sales":18176.026489},{"location__name":"Newcastle (Centre)","forecast_sales":25800},{"location__name":"Newcastle (Jesmond)","forecast_sales":18000},{"location__name":"Nottingham","forecast_sales":20250},{"location__name":"York","forecast_sales":31000}]},"forecast_sales|2026-07-20|2026-07-26|[\"location\"]":{"data":[{"location__name":"Birmingham","forecast_sales":19821.595215},{"location__name":"Cardiff","forecast_sales":22750},{"location__name":"Durham","forecast_sales":24800},{"location__name":"Edinburgh","forecast_sales":28500},{"location__name":"Glasgow","forecast_sales":31000},{"location__name":"Leeds","forecast_sales":26750},{"location__name":"Leeds (Headingley)","forecast_sales":15000},{"location__name":"Liverpool","forecast_sales":18593.940919},{"location__name":"Newcastle (Centre)","forecast_sales":30700},{"location__name":"Newcastle (Jesmond)","forecast_sales":18200},{"location__name":"Nottingham","forecast_sales":20000},{"location__name":"York","forecast_sales":35000}]},"labor_cost|2026-07-06|2026-07-12|[\"location\"]":{"data":[{"rotalocation__app_location__name":"Leeds","labor_cost":7393.98},{"rotalocation__app_location__name":"Newcastle (Centre)","labor_cost":8376.99},{"rotalocation__app_location__name":"Durham","labor_cost":8444.49},{"rotalocation__app_location__name":"Edinburgh","labor_cost":8441.73},{"rotalocation__app_location__name":"Leeds (Headingley)","labor_cost":4306.1},{"rotalocation__app_location__name":"Glasgow","labor_cost":8763.66},{"rotalocation__app_location__name":"Liverpool","labor_cost":6995.74},{"rotalocation__app_location__name":"Birmingham","labor_cost":6374.47},{"rotalocation__app_location__name":"Newcastle (Jesmond)","labor_cost":6817.89},{"rotalocation__app_location__name":"Cardiff","labor_cost":7484.41},{"rotalocation__app_location__name":"York","labor_cost":9756.05},{"rotalocation__app_location__name":"Nottingham","labor_cost":7465.58}]},"labor_cost|2026-07-01|2026-07-14|[\"location\"]":{"data":[{"rotalocation__app_location__name":"Newcastle (Centre)","labor_cost":16869.98},{"rotalocation__app_location__name":"Leeds (Headingley)","labor_cost":10002.9},{"rotalocation__app_location__name":"Birmingham","labor_cost":12713.82},{"rotalocation__app_location__name":"York","labor_cost":19525.73},{"rotalocation__app_location__name":"Nottingham","labor_cost":15219.61},{"rotalocation__app_location__name":"Leeds","labor_cost":15377.76},{"rotalocation__app_location__name":"Durham","labor_cost":17212.88},{"rotalocation__app_location__name":"Edinburgh","labor_cost":16883.47},{"rotalocation__app_location__name":"Glasgow","labor_cost":17705.41},{"rotalocation__app_location__name":"Liverpool","labor_cost":14087.47},{"rotalocation__app_location__name":"Newcastle (Jesmond)","labor_cost":13623.03},{"rotalocation__app_location__name":"Cardiff","labor_cost":15257.8}]},"planned_labor_cost|2026-07-06|2026-07-12|[\"location\"]":{"data":[{"rotalocation__app_location__name":"Leeds","planned_labor_cost":7393.98},{"rotalocation__app_location__name":"Newcastle (Centre)","planned_labor_cost":8376.99},{"rotalocation__app_location__name":"Durham","planned_labor_cost":8444.49},{"rotalocation__app_location__name":"Edinburgh","planned_labor_cost":8441.73},{"rotalocation__app_location__name":"Leeds (Headingley)","planned_labor_cost":4306.1},{"rotalocation__app_location__name":"Glasgow","planned_labor_cost":8763.66},{"rotalocation__app_location__name":"Liverpool","planned_labor_cost":6995.74},{"rotalocation__app_location__name":"Birmingham","planned_labor_cost":6374.47},{"rotalocation__app_location__name":"Newcastle (Jesmond)","planned_labor_cost":6817.89},{"rotalocation__app_location__name":"Cardiff","planned_labor_cost":7484.41},{"rotalocation__app_location__name":"York","planned_labor_cost":9756.05},{"rotalocation__app_location__name":"Nottingham","planned_labor_cost":7465.58}]},"planned_labor_cost|2026-07-13|2026-07-19|[\"location\"]":{"data":[{"rotalocation__app_location__name":"Leeds","planned_labor_cost":8506.09},{"rotalocation__app_location__name":"Birmingham","planned_labor_cost":6977.77},{"rotalocation__app_location__name":"Newcastle (Jesmond)","planned_labor_cost":6532.74},{"rotalocation__app_location__name":"Newcastle (Centre)","planned_labor_cost":8601.95},{"rotalocation__app_location__name":"Cardiff","planned_labor_cost":8422.3},{"rotalocation__app_location__name":"Durham","planned_labor_cost":8323.35},{"rotalocation__app_location__name":"Edinburgh","planned_labor_cost":8522.03},{"rotalocation__app_location__name":"Leeds (Headingley)","planned_labor_cost":5329.65},{"rotalocation__app_location__name":"York","planned_labor_cost":10480.7},{"rotalocation__app_location__name":"Nottingham","planned_labor_cost":7585.52},{"rotalocation__app_location__name":"Glasgow","planned_labor_cost":9204.25},{"rotalocation__app_location__name":"Liverpool","planned_labor_cost":7625.94}]},"planned_labor_cost|2026-07-20|2026-07-26|[\"location\"]":{"data":[{"rotalocation__app_location__name":"Birmingham","planned_labor_cost":6707.37},{"rotalocation__app_location__name":"Cardiff","planned_labor_cost":8250.08},{"rotalocation__app_location__name":"Durham","planned_labor_cost":8063.94},{"rotalocation__app_location__name":"Edinburgh","planned_labor_cost":8780.3},{"rotalocation__app_location__name":"Glasgow","planned_labor_cost":9452.83},{"rotalocation__app_location__name":"Leeds","planned_labor_cost":8054.89},{"rotalocation__app_location__name":"Leeds (Headingley)","planned_labor_cost":5347.82},{"rotalocation__app_location__name":"Liverpool","planned_labor_cost":7599.51},{"rotalocation__app_location__name":"Newcastle (Centre)","planned_labor_cost":9764.15},{"rotalocation__app_location__name":"Newcastle (Jesmond)","planned_labor_cost":6268.12},{"rotalocation__app_location__name":"Nottingham","planned_labor_cost":7900.5},{"rotalocation__app_location__name":"York","planned_labor_cost":9700.03}]},"labor_cost|2026-07-06|2026-07-12|[\"location\",\"labor_house_part\"]":{"data":[{"rotalocation__app_location__name":"Edinburgh","rotahousepart__name":"BOH","labor_cost":4257.73},{"rotalocation__app_location__name":"Newcastle (Centre)","rotahousepart__name":"BOH","labor_cost":3963.94},{"rotalocation__app_location__name":"Newcastle (Jesmond)","rotahousepart__name":"FOH","labor_cost":3048.1},{"rotalocation__app_location__name":"Leeds (Headingley)","rotahousepart__name":"BOH","labor_cost":2369.35},{"rotalocation__app_location__name":"Cardiff","rotahousepart__name":"FOH","labor_cost":3414.74},{"rotalocation__app_location__name":"York","rotahousepart__name":"BOH","labor_cost":4823.87},{"rotalocation__app_location__name":"Durham","rotahousepart__name":"BOH","labor_cost":4374.04},{"rotalocation__app_location__name":"Leeds","rotahousepart__name":"FOH","labor_cost":3647.02},{"rotalocation__app_location__name":"Glasgow","rotahousepart__name":"FOH","labor_cost":4154.53},{"rotalocation__app_location__name":"Birmingham","rotahousepart__name":"FOH","labor_cost":3303.84},{"rotalocation__app_location__name":"Glasgow","rotahousepart__name":"BOH","labor_cost":4609.13},{"rotalocation__app_location__name":"Nottingham","rotahousepart__name":"BOH","labor_cost":3584.8},{"rotalocation__app_location__name":"Birmingham","rotahousepart__name":"BOH","labor_cost":3070.63},{"rotalocation__app_location__name":"Newcastle (Centre)","rotahousepart__name":"FOH","labor_cost":4413.05},{"rotalocation__app_location__name":"Newcastle (Jesmond)","rotahousepart__name":"BOH","labor_cost":3769.79},{"rotalocation__app_location__name":"Leeds (Headingley)","rotahousepart__name":"FOH","labor_cost":1936.75},{"rotalocation__app_location__name":"Liverpool","rotahousepart__name":"FOH","labor_cost":3157.73},{"rotalocation__app_location__name":"Durham","rotahousepart__name":"FOH","labor_cost":4070.45},{"rotalocation__app_location__name":"Nottingham","rotahousepart__name":"FOH","labor_cost":3880.78},{"rotalocation__app_location__name":"Liverpool","rotahousepart__name":"Cleaner","labor_cost":158.3},{"rotalocation__app_location__name":"Edinburgh","rotahousepart__name":"FOH","labor_cost":4184},{"rotalocation__app_location__name":"York","rotahousepart__name":"FOH","labor_cost":4932.18},{"rotalocation__app_location__name":"Cardiff","rotahousepart__name":"BOH","labor_cost":4069.67},{"rotalocation__app_location__name":"Leeds","rotahousepart__name":"BOH","labor_cost":3746.96},{"rotalocation__app_location__name":"Liverpool","rotahousepart__name":"BOH","labor_cost":3679.71}]},"discounts|2026-07-06|2026-07-12|[\"location\"]":{"data":[{"poslocation__app_location__name":"Leeds","discounts":418},{"poslocation__app_location__name":"Newcastle (Centre)","discounts":215.52},{"poslocation__app_location__name":"Durham","discounts":106.86},{"poslocation__app_location__name":"Edinburgh","discounts":51.26},{"poslocation__app_location__name":"Leeds (Headingley)","discounts":128.54},{"poslocation__app_location__name":"Glasgow","discounts":83.81},{"poslocation__app_location__name":"Liverpool","discounts":82.97},{"poslocation__app_location__name":"Birmingham","discounts":91.11},{"poslocation__app_location__name":"Newcastle (Jesmond)","discounts":113.73},{"poslocation__app_location__name":"Cardiff","discounts":67.31},{"poslocation__app_location__name":"York","discounts":174.39},{"poslocation__app_location__name":"Nottingham","discounts":26.61}]},"discounts|2026-07-06|2026-07-12|[\"location\",\"discount_type\"]":{"data":[{"posdiscount__name":"Service Complaint 50%","poslocation__app_location__name":"York","discounts":15},{"posdiscount__name":"Food Quality Complaint 100%","poslocation__app_location__name":"Edinburgh","discounts":12},{"posdiscount__name":"Staff Discount 50%","poslocation__app_location__name":"Newcastle (Centre)","discounts":17.63},{"posdiscount__name":"Food Quality Complaint 100%","poslocation__app_location__name":"Nottingham","discounts":15.9},{"posdiscount__name":"Staff Discount 50%","poslocation__app_location__name":"Newcastle (Jesmond)","discounts":37.62},{"posdiscount__name":"Food Quality Complaint 100%","poslocation__app_location__name":"York","discounts":9.5},{"posdiscount__name":"Staff Discount 50%","poslocation__app_location__name":"Leeds (Headingley)","discounts":8.5},{"posdiscount__name":"Staff Discount 50%","poslocation__app_location__name":"Liverpool","discounts":24.37},{"posdiscount__name":"20% Student Discount","poslocation__app_location__name":"Glasgow","discounts":41.23},{"posdiscount__name":"Staff Discount 50%","poslocation__app_location__name":"Birmingham","discounts":11.79},{"posdiscount__name":"20% Student Discount","poslocation__app_location__name":"Leeds","discounts":71.16},{"posdiscount__name":"Food Wait 20%","poslocation__app_location__name":"Leeds","discounts":20.8},{"posdiscount__name":"Food Quality Complaint 100%","poslocation__app_location__name":"Newcastle (Centre)","discounts":25.9},{"posdiscount__name":"20% Student Discount","poslocation__app_location__name":"York","discounts":21.17},{"posdiscount__name":"Staff Discount 50%","poslocation__app_location__name":"Edinburgh","discounts":9.54},{"posdiscount__name":"Food Wait 100%","poslocation__app_location__name":"Newcastle (Centre)","discounts":3.4},{"posdiscount__name":"Head Office Food","poslocation__app_location__name":"Edinburgh","discounts":16.9},{"posdiscount__name":"Dine and Dash","poslocation__app_location__name":"Leeds (Headingley)","discounts":37.4},{"posdiscount__name":"Smashed/Broken/Mistake","poslocation__app_location__name":"Leeds","discounts":47.7},{"posdiscount__name":"Food Quality Complaint 100%","poslocation__app_location__name":"Leeds","discounts":22.4},{"posdiscount__name":"Staff Discount 20%","poslocation__app_location__name":"Durham","discounts":10.94},{"posdiscount__name":"£2 Loyalty Discount","poslocation__app_location__name":"Glasgow","discounts":1.67},{"posdiscount__name":"Staff Discount 20%","poslocation__app_location__name":"Edinburgh","discounts":2.82},{"posdiscount__name":"Smashed/Broken/Mistake","poslocation__app_location__name":"Leeds (Headingley)","discounts":17.9},{"posdiscount__name":"Smashed/Broken/Mistake","poslocation__app_location__name":"Newcastle (Jesmond)","discounts":66.5},{"posdiscount__name":"20% Student Discount","poslocation__app_location__name":"Durham","discounts":58.72},{"posdiscount__name":"20% Student Discount","poslocation__app_location__name":"Cardiff","discounts":28.37},{"posdiscount__name":"Dine and Dash","poslocation__app_location__name":"York","discounts":46.4},{"posdiscount__name":"Staff Discount 50%","poslocation__app_location__name":"Cardiff","discounts":3.29},{"posdiscount__name":"Smashed/Broken/Mistake","poslocation__app_location__name":"York","discounts":15.6},{"posdiscount__name":"Food Quality Complaint 100%","poslocation__app_location__name":"Birmingham","discounts":14.9},{"posdiscount__name":"Food Quality Complaint 100%","poslocation__app_location__name":"Leeds (Headingley)","discounts":17.9},{"posdiscount__name":"20% Student Discount","poslocation__app_location__name":"Newcastle (Centre)","discounts":159.08},{"posdiscount__name":"Food Quality Complaint 20%","poslocation__app_location__name":"Cardiff","discounts":2.65},{"posdiscount__name":"Staff Discount 50%","poslocation__app_location__name":"Durham","discounts":25.48},{"posdiscount__name":"Dine and Dash","poslocation__app_location__name":"Cardiff","discounts":13.2},{"posdiscount__name":"20% Student Discount","poslocation__app_location__name":"Liverpool","discounts":54.53},{"posdiscount__name":"Food Quality Complaint 50%","poslocation__app_location__name":"Leeds","discounts":8.33},{"posdiscount__name":"Staff Discount 50%","poslocation__app_location__name":"York","discounts":24.52},{"posdiscount__name":"Food Wait 50%","poslocation__app_location__name":"Glasgow","discounts":26.95},{"posdiscount__name":"Food Quality Complaint 100%","poslocation__app_location__name":"Glasgow","discounts":6.5},{"posdiscount__name":"Food Wait 50%","poslocation__app_location__name":"Newcastle (Centre)","discounts":2.46},{"posdiscount__name":"Staff Discount 20%","poslocation__app_location__name":"Leeds (Headingley)","discounts":0.34},{"posdiscount__name":"Food Quality Complaint 20%","poslocation__app_location__name":"Liverpool","discounts":4.07},{"posdiscount__name":"Head Office Food","poslocation__app_location__name":"York","discounts":32.8},{"posdiscount__name":"Drink Quality 50%","poslocation__app_location__name":"Nottingham","discounts":1.5},{"posdiscount__name":"Food Wait 100%","poslocation__app_location__name":"York","discounts":9.4},{"posdiscount__name":"20% Student Discount","poslocation__app_location__name":"Newcastle (Jesmond)","discounts":9.61},{"posdiscount__name":"20% Student Discount","poslocation__app_location__name":"Leeds (Headingley)","discounts":38.08},{"posdiscount__name":"Food Wait 100%","poslocation__app_location__name":"Leeds","discounts":172.7},{"posdiscount__name":"£2 Loyalty Discount","poslocation__app_location__name":"Leeds","discounts":1.67},{"posdiscount__name":"Drinks Wait 50%","poslocation__app_location__name":"Nottingham","discounts":3.51},{"posdiscount__name":"Dine and Dash","poslocation__app_location__name":"Birmingham","discounts":27.8},{"posdiscount__name":"Staff Discount 20%","poslocation__app_location__name":"Cardiff","discounts":19.8},{"posdiscount__name":"Food Wait 20%","poslocation__app_location__name":"Leeds (Headingley)","discounts":2.42},{"posdiscount__name":"Staff Discount 50%","poslocation__app_location__name":"Glasgow","discounts":7.46},{"posdiscount__name":"Marketing Comp","poslocation__app_location__name":"Leeds","discounts":50.9},{"posdiscount__name":"Food Wait 50%","poslocation__app_location__name":"Durham","discounts":11.72},{"posdiscount__name":"Food Wait 50%","poslocation__app_location__name":"Birmingham","discounts":2.88},{"posdiscount__name":"Food Quality Complaint 20%","poslocation__app_location__name":"Nottingham","discounts":2.65},{"posdiscount__name":"Food Wait 50%","poslocation__app_location__name":"Leeds","discounts":18.04},{"posdiscount__name":"Staff Discount 20%","poslocation__app_location__name":"Newcastle (Centre)","discounts":7.05},{"posdiscount__name":"20% Student Discount","poslocation__app_location__name":"Edinburgh","discounts":10},{"posdiscount__name":"20% Student Discount","poslocation__app_location__name":"Birmingham","discounts":33.74},{"posdiscount__name":"Staff Discount 20%","poslocation__app_location__name":"Nottingham","discounts":3.05},{"posdiscount__name":"Food Wait 50%","poslocation__app_location__name":"Leeds (Headingley)","discounts":6},{"posdiscount__name":"Staff Discount 20%","poslocation__app_location__name":"Leeds","discounts":4.3}]},"wastage|2026-07-06|2026-07-12|[\"location\"]":{"data":[{"invlocation__app_location__name":"Leeds","wastage":74.93},{"invlocation__app_location__name":"Birmingham","wastage":118.87},{"invlocation__app_location__name":"Newcastle (Jesmond)","wastage":46.26},{"invlocation__app_location__name":"Newcastle (Centre)","wastage":59.22},{"invlocation__app_location__name":"Cardiff","wastage":104.27},{"invlocation__app_location__name":"Durham","wastage":37.55},{"invlocation__app_location__name":"Edinburgh","wastage":171.72},{"invlocation__app_location__name":"Leeds (Headingley)","wastage":128.05},{"invlocation__app_location__name":"York","wastage":18.39},{"invlocation__app_location__name":"Nottingham","wastage":91.51},{"invlocation__app_location__name":"Glasgow","wastage":113.34},{"invlocation__app_location__name":"Liverpool","wastage":124.24}]},"purchases|2026-07-06|2026-07-12|[\"location\",\"inventory_category\"]":{"data":[{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food/Orders-Brakes FOH","purchases":235.78},{"invlocation__app_location__name":"Leeds","item__category__name":"Food-Orders-Brakes","purchases":29.25},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food-Orders-Original Bakehouse","purchases":445.35},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food/Sides","purchases":73.02},{"invlocation__app_location__name":"Durham","item__category__name":"Drink-Orders-LWC Alcohol","purchases":27.43},{"invlocation__app_location__name":"Durham","item__category__name":"Food-Orders-Bidfood-FOH","purchases":0},{"invlocation__app_location__name":"Leeds","item__category__name":"Drink-Orders-Deli Fresh (FOH)","purchases":14.32},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food/vegan/Extras","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Drink/Draft","purchases":0},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Orders-Mac (Consumables)","purchases":0},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Orders-Mac Prime costs","purchases":0},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food-Orders-Brakes (Dry)","purchases":173.19},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food/Sides","purchases":146.04},{"invlocation__app_location__name":"Birmingham","item__category__name":"Food/Orders-Amazon","purchases":0},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food-Orders-Aubrey Allen","purchases":874.84},{"invlocation__app_location__name":"Leeds","item__category__name":"Drink-Orders-LWC","purchases":563.12},{"invlocation__app_location__name":"York","item__category__name":"Food-Orders-Original Bakehouse","purchases":599.07},{"invlocation__app_location__name":"Liverpool","item__category__name":"Oil-Orders-OLLECO","purchases":402.5},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food/Orders-Brakes FOH","purchases":71.61},{"invlocation__app_location__name":"Nottingham","item__category__name":"Drink-Orders-Deli Fresh (FOH)","purchases":58.17},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Drink/Wine","purchases":0},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food-Orders-Bidfood-FOH","purchases":49.44},{"invlocation__app_location__name":"Leeds","item__category__name":"Oil-Orders-OLLECO","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Menu/Build/Prep","purchases":0},{"invlocation__app_location__name":"Leeds","item__category__name":"Orders-Mac (Consumables)","purchases":0},{"invlocation__app_location__name":"Durham","item__category__name":"Orders-Crosbys (Packaging)","purchases":29.67},{"invlocation__app_location__name":"Birmingham","item__category__name":"Drink/Draft/soft","purchases":0},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food-Orders-Brakes (Dry)","purchases":123.06},{"invlocation__app_location__name":"Durham","item__category__name":"Menu/Build/Prep","purchases":0},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food/Sauce","purchases":0},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Drink-Orders-Matthew Clark","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Menu/Build/Prep","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food-Orders-Aubrey Allen","purchases":1398.92},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food-Orders-Brakes (Frozen)","purchases":901.71},{"invlocation__app_location__name":"Birmingham","item__category__name":"Drink/Wine","purchases":17.67},{"invlocation__app_location__name":"Leeds","item__category__name":"Food-Orders-Deli Fresh","purchases":267.47},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Drink-Orders-Deli Fresh (FOH)","purchases":18.16},{"invlocation__app_location__name":"Durham","item__category__name":"Drink-Orders-Matthew Clark","purchases":0},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Drink-Orders-LWC","purchases":0},{"invlocation__app_location__name":"Durham","item__category__name":"Food/Sides","purchases":16.3},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Drink-order-HQ","purchases":0},{"invlocation__app_location__name":"Cardiff","item__category__name":"Drink-Orders-Allendale","purchases":0},{"invlocation__app_location__name":"Cardiff","item__category__name":"Drink-Orders-Deli Fresh (FOH)","purchases":25.44},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food-Orders-Original Bakehouse","purchases":829.44},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food-Orders-Harvey & Brockless","purchases":88.56},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food-Orders-Brakes (Fresh)","purchases":642.3},{"invlocation__app_location__name":"Leeds","item__category__name":"Food/Specials","purchases":0},{"invlocation__app_location__name":"Leeds","item__category__name":"Food/Sauce","purchases":0},{"invlocation__app_location__name":"Cardiff","item__category__name":"Drink/Wine","purchases":35.34},{"invlocation__app_location__name":"Durham","item__category__name":"Drink-order-HQ","purchases":0},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food-Orders-Deli Fresh","purchases":329.9},{"invlocation__app_location__name":"Nottingham","item__category__name":"Orders-Mac Prime costs","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Orders-Mac (Consumables)","purchases":0},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Drink-Orders-ABCO","purchases":84.62},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"OIL-Orders-Used oil","purchases":-21},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food-Orders-Aubrey Allen","purchases":980.14},{"invlocation__app_location__name":"Nottingham","item__category__name":"Menu/Build/Prep","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Drink-Orders-LWC Alcohol","purchases":17.86},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Drink-Orders-Brakes -(Drinks)","purchases":0},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Oil-Orders-OLLECO","purchases":57.5},{"invlocation__app_location__name":"York","item__category__name":"Food-Orders-Harvey & Brockless","purchases":356.7},{"invlocation__app_location__name":"Nottingham","item__category__name":"Oil-Orders-OLLECO","purchases":460},{"invlocation__app_location__name":"Cardiff","item__category__name":"Orders-Crosbys","purchases":45.1},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Drink-Orders-Matthew Clark","purchases":0},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food-Orders-HQ (Food)","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Orders-Mac (Consumables)","purchases":3.8},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Drink-order-HQ","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Food-Orders-Brakes (Frozen)","purchases":828.36},{"invlocation__app_location__name":"Leeds","item__category__name":"Food/sides/chip upgrade","purchases":0},{"invlocation__app_location__name":"Leeds","item__category__name":"Food-Orders-Brakes (Meat)","purchases":525.28},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food/Orders-Brakes FOH","purchases":95.48},{"invlocation__app_location__name":"Glasgow","item__category__name":"Orders-Crosbys (Packaging)","purchases":187.5},{"invlocation__app_location__name":"Durham","item__category__name":"Food-Orders-Harvey & Brockless","purchases":324.37},{"invlocation__app_location__name":"Liverpool","item__category__name":"Orders-Mac (Consumables)","purchases":0},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Oil-Orders-OLLECO","purchases":345},{"invlocation__app_location__name":"Glasgow","item__category__name":"Orders-Crosbys","purchases":141.09},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food-Orders-Bidfood-FOH","purchases":98.88},{"invlocation__app_location__name":"York","item__category__name":"Food-Orders-Bidfood-FOH","purchases":49.44},{"invlocation__app_location__name":"Liverpool","item__category__name":"Drink-Orders-LWC","purchases":0},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food/Orders-Amazon","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"OIL-Orders-Used oil","purchases":-105},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food-Orders-Original Bakehouse","purchases":515.28},{"invlocation__app_location__name":"Glasgow","item__category__name":"Drink-Orders-LWC","purchases":929.17},{"invlocation__app_location__name":"Durham","item__category__name":"Food-Orders-Brakes (Dry)","purchases":164.64},{"invlocation__app_location__name":"Cardiff","item__category__name":"Drink-Orders-ABCO","purchases":128.62},{"invlocation__app_location__name":"Edinburgh","item__category__name":"OIL-Orders-Used oil","purchases":-210},{"invlocation__app_location__name":"Glasgow","item__category__name":"Crosbys","purchases":29.73},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food-Orders-Brakes (Meat)","purchases":970.47},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Orders-Crosbys","purchases":4.2},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food/Sides","purchases":81.17},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food-Orders-Harvey & Brockless","purchases":489.71},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food-Orders-Bidfood-FOH","purchases":24.72},{"invlocation__app_location__name":"Birmingham","item__category__name":"Food-Orders-Brakes (Meat)","purchases":957.38},{"invlocation__app_location__name":"Nottingham","item__category__name":"Crosbys","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food-Orders-Aubrey Allen","purchases":1560.77},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food-Orders-Brakes (Fresh)","purchases":433.85},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Menu/Build/Prep","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food/Vegan","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food-Orders-HQ (Food)","purchases":0},{"invlocation__app_location__name":"Leeds","item__category__name":"Food-Orders-Brakes (Fresh)","purchases":420.03},{"invlocation__app_location__name":"Birmingham","item__category__name":"Food/Sides","purchases":90.72},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food-Orders-Bidfood-FOH","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Drink-Orders-ABCO","purchases":0},{"invlocation__app_location__name":"Durham","item__category__name":"OIL-Orders-Used oil","purchases":-70},{"invlocation__app_location__name":"Durham","item__category__name":"Food-Orders-Deli Fresh","purchases":341.45},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food-Orders-Brakes (Fresh)","purchases":413.34},{"invlocation__app_location__name":"Nottingham","item__category__name":"Drink/Wine","purchases":0},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food-Orders-Brakes","purchases":45.03},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food-Orders-Original Bakehouse","purchases":459.42},{"invlocation__app_location__name":"York","item__category__name":"Food/Orders-Brakes FOH","purchases":61.74},{"invlocation__app_location__name":"Cardiff","item__category__name":"Menu/Build/Prep","purchases":0},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food/Orders-Brakes FOH","purchases":0},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food-Orders-Deli Fresh","purchases":127.58},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Drink-order-HQ","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Drink-Orders-Allendale","purchases":0},{"invlocation__app_location__name":"Leeds","item__category__name":"Drink/Wine","purchases":11.78},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food-Orders-Original Bakehouse","purchases":459.42},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food-Orders-Harvey & Brockless","purchases":321.07},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food-Orders-Brakes (Meat)","purchases":1025.83},{"invlocation__app_location__name":"Liverpool","item__category__name":"Drink-order-HQ","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Drink-Orders-Brakes -(Drinks)","purchases":37.78},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food/Starter","purchases":0},{"invlocation__app_location__name":"Durham","item__category__name":"Food-Orders-Brakes (Meat)","purchases":992.32},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food-Orders-Brakes (Frozen)","purchases":1397.37},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Drink-Orders-LWC","purchases":0},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food-Orders-Harvey & Brockless","purchases":212.05},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food-Orders-Brakes (Frozen)","purchases":1147.23},{"invlocation__app_location__name":"Nottingham","item__category__name":"Orders-Crosbys","purchases":53.13},{"invlocation__app_location__name":"Leeds","item__category__name":"Food-Orders-Aubrey Allen","purchases":1434.88},{"invlocation__app_location__name":"Leeds","item__category__name":"Drink-Orders-ABCO","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Food-Orders-Brakes","purchases":0},{"invlocation__app_location__name":"Durham","item__category__name":"Food-Orders-Original Bakehouse","purchases":277.77},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Orders-Crosbys (Packaging)","purchases":188},{"invlocation__app_location__name":"Leeds","item__category__name":"Drink-Orders-Matthew Clark","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Food-Orders-Brakes (Dry)","purchases":165.15},{"invlocation__app_location__name":"Cardiff","item__category__name":"Drink-Orders-Brakes -(Drinks)","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Orders-Mac Prime costs","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food/Orders-Amazon","purchases":0},{"invlocation__app_location__name":"Cardiff","item__category__name":"Drink-Orders-LWC","purchases":411.99},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food/sides/chip upgrade","purchases":0},{"invlocation__app_location__name":"Durham","item__category__name":"Food-Orders-Brakes","purchases":57.99},{"invlocation__app_location__name":"York","item__category__name":"Orders-Crosbys (Packaging)","purchases":186.99},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Drink-Orders-Brakes -(Drinks)","purchases":14.74},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food-Orders-Brakes (Meat)","purchases":1188.82},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food-Orders-Brakes","purchases":109.41},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food/Sauce","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Drink-Orders-LWC Alcohol","purchases":0},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food/Sauce","purchases":0},{"invlocation__app_location__name":"Durham","item__category__name":"Drink-Orders-Deli Fresh (FOH)","purchases":21.67},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food-Orders-Brakes (Fresh)","purchases":95.65},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food-Orders-Brakes (Dry)","purchases":194.9},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food/Orders-Amazon","purchases":0},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food-Orders-Bidfood-FOH","purchases":74.16},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food-Orders-Aubrey Allen","purchases":403.2},{"invlocation__app_location__name":"Durham","item__category__name":"Food-Orders-Aubrey Allen","purchases":1259.78},{"invlocation__app_location__name":"Cardiff","item__category__name":"Crosbys","purchases":24.12},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food-Orders-Brakes (Dry)","purchases":244.04},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Drink-Orders-Allendale","purchases":0},{"invlocation__app_location__name":"Durham","item__category__name":"Drink/Wine","purchases":0},{"invlocation__app_location__name":"York","item__category__name":"Drink-Orders-Brakes -(Drinks)","purchases":38.4},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Orders-Mac Prime costs","purchases":0},{"invlocation__app_location__name":"Leeds","item__category__name":"Food-Orders-Brakes (Dry)","purchases":135.08},{"invlocation__app_location__name":"Glasgow","item__category__name":"Orders-Mac (Consumables)","purchases":0},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Drink-Orders-Matthew Clark","purchases":19.05},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food/Sides","purchases":105.62},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food/Chicken/Double","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food-Orders-Brakes (Frozen)","purchases":1072.01},{"invlocation__app_location__name":"Liverpool","item__category__name":"Drink-Orders-ABCO","purchases":0},{"invlocation__app_location__name":"Liverpool","item__category__name":"Drink/Wine","purchases":0},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food/Sauce","purchases":0},{"invlocation__app_location__name":"Liverpool","item__category__name":"Drink-Orders-Deli Fresh (FOH)","purchases":1.37},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food-Orders-Original Bakehouse","purchases":354.63},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food-Orders-Harvey & Brockless","purchases":316.7},{"invlocation__app_location__name":"Cardiff","item__category__name":"Drink-Orders-LWC Alcohol","purchases":134.23},{"invlocation__app_location__name":"York","item__category__name":"Food-Orders-Deli Fresh","purchases":228.09},{"invlocation__app_location__name":"Durham","item__category__name":"Drink-Orders-LWC","purchases":382.35},{"invlocation__app_location__name":"Durham","item__category__name":"Orders-Mac (Consumables)","purchases":0},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food/Sauce","purchases":0},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food-Orders-Brakes (Dry)","purchases":355.15},{"invlocation__app_location__name":"York","item__category__name":"Oil-Orders-OLLECO","purchases":230},{"invlocation__app_location__name":"Durham","item__category__name":"Food-Orders-HQ (Food)","purchases":0},{"invlocation__app_location__name":"Leeds","item__category__name":"Drink-order-HQ","purchases":0},{"invlocation__app_location__name":"Liverpool","item__category__name":"Drink-Orders-Brakes -(Drinks)","purchases":0},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Drink-Orders-LWC Alcohol","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food-Orders-HQ (Food)","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Orders-Mac (Consumables)","purchases":0},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food/Orders-Amazon","purchases":0},{"invlocation__app_location__name":"York","item__category__name":"Food-Orders-Brakes (Frozen)","purchases":1297.11},{"invlocation__app_location__name":"Birmingham","item__category__name":"Drink-Orders-LWC","purchases":538.61},{"invlocation__app_location__name":"Birmingham","item__category__name":"Menu/Build/Prep","purchases":0},{"invlocation__app_location__name":"Cardiff","item__category__name":"Drink-Orders-Matthew Clark","purchases":19.05},{"invlocation__app_location__name":"Leeds","item__category__name":"Food-Orders-Bidfood-FOH","purchases":41.2},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Drink-Orders-Deli Fresh (FOH)","purchases":17.74},{"invlocation__app_location__name":"Liverpool","item__category__name":"Drink-Orders-Matthew Clark","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Food/Orders-Brakes FOH","purchases":30.99},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Drink-Orders-LWC Alcohol","purchases":17.86},{"invlocation__app_location__name":"Birmingham","item__category__name":"Crosbys","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food/Sides","purchases":13.75},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food-Orders-Deli Fresh","purchases":128.49},{"invlocation__app_location__name":"Birmingham","item__category__name":"Food-Orders-HQ (Food)","purchases":0},{"invlocation__app_location__name":"Durham","item__category__name":"Food/Sauce","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Drink-Orders-Deli Fresh (FOH)","purchases":35.98},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food-Orders-Bidfood-FOH","purchases":49.44},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Drink-Orders-LWC Alcohol","purchases":64.74},{"invlocation__app_location__name":"Glasgow","item__category__name":"Drink-Orders-Matthew Clark","purchases":38.1},{"invlocation__app_location__name":"Durham","item__category__name":"Orders-Crosbys","purchases":115.04},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Drink/Wine","purchases":0},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Oil-Orders-OLLECO","purchases":517.5},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Orders-Crosbys","purchases":170.61},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food-Orders-HQ (Food)","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Drink-Orders-Brakes -(Drinks)","purchases":11.52},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food-Orders-Deli Fresh","purchases":258.7},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Menu/Build","purchases":0},{"invlocation__app_location__name":"Durham","item__category__name":"Drink-Orders-Allendale","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food-Orders-Deli Fresh","purchases":132.03},{"invlocation__app_location__name":"Glasgow","item__category__name":"Drink/Wine","purchases":35.34},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food-Orders-Brakes","purchases":64.36},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food-Orders-Brakes (Fresh)","purchases":440.64},{"invlocation__app_location__name":"York","item__category__name":"Drink/Shakes","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Drink-Orders-LWC Alcohol","purchases":66.39},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food/Sides","purchases":40.02},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Drink/Wine","purchases":0},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"OIL-Orders-Used oil","purchases":-56},{"invlocation__app_location__name":"York","item__category__name":"Orders - Crosbys (BioHygienie)","purchases":58},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food-Orders-HQ (Food)","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Orders-Crosbys","purchases":99.8},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food/Orders-Amazon","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Drink-Orders-Matthew Clark","purchases":94.54},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Drink-Orders-LWC","purchases":327.25},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"OIL-Orders-Used oil","purchases":-42},{"invlocation__app_location__name":"Birmingham","item__category__name":"OIL-Orders-Used oil","purchases":-49},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food-Orders-Brakes (Dry)","purchases":120.98},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food-Orders-Aubrey Allen","purchases":1008},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Crosbys","purchases":15.11},{"invlocation__app_location__name":"Birmingham","item__category__name":"Drink-Orders-Allendale","purchases":52.89},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food/Orders-Amazon","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Oil-Orders-OLLECO","purchases":0},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food-Orders-Aubrey Allen","purchases":2215.28},{"invlocation__app_location__name":"Durham","item__category__name":"Food/Orders-Amazon","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Drink-Orders-Deli Fresh (FOH)","purchases":27.81},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food-Orders-Brakes (Meat)","purchases":1404.12},{"invlocation__app_location__name":"York","item__category__name":"Drink-Orders-Deli Fresh (FOH)","purchases":15.37},{"invlocation__app_location__name":"Liverpool","item__category__name":"Drink-Orders-Allendale","purchases":0},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Drink-Orders-ABCO","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Oil-Orders-OLLECO","purchases":172.5},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food/Orders-Brakes FOH","purchases":138.9},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food-Orders-Brakes","purchases":65.38},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food-Orders-Deli Fresh","purchases":231.99},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Orders-Crosbys (Packaging)","purchases":52.5},{"invlocation__app_location__name":"Birmingham","item__category__name":"Drink-Orders-ABCO","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food/Sauce","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food-Orders-Brakes (Frozen)","purchases":619.01},{"invlocation__app_location__name":"Leeds","item__category__name":"Food/Sides","purchases":154.19},{"invlocation__app_location__name":"Birmingham","item__category__name":"Drink-Orders-LWC Alcohol","purchases":144.19},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food-Orders-Original Bakehouse","purchases":433.02},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food-Orders-Bidfood-FOH","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Orders-Crosbys (Packaging)","purchases":267.23},{"invlocation__app_location__name":"Birmingham","item__category__name":"Drink-Orders-Deli Fresh (FOH)","purchases":16.41},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Drink-order-HQ","purchases":0},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Drink-Orders-Deli Fresh (FOH)","purchases":25.62},{"invlocation__app_location__name":"Durham","item__category__name":"Orders-Mac Prime costs","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food-Orders-Brakes (Dry)","purchases":232.51},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Drink-Orders-Brakes -(Drinks)","purchases":14.74},{"invlocation__app_location__name":"York","item__category__name":"Drink/Soft","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Food/Sauce","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food/Orders-Brakes FOH","purchases":0},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Orders-Mac Prime costs","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Drink/Wine","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Drink-Orders-Matthew Clark","purchases":0},{"invlocation__app_location__name":"Durham","item__category__name":"Crosbys","purchases":59.96},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food/Sides","purchases":44.66},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food-Orders-Brakes (Frozen)","purchases":843.72},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food-Orders-HQ (Food)","purchases":0},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food-Orders-HQ (Food)","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food/Sauce","purchases":0},{"invlocation__app_location__name":"Liverpool","item__category__name":"Drink-Orders-LWC Alcohol","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food-Orders-Original Bakehouse","purchases":216.51},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food-Orders-Brakes","purchases":46.63},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Orders-Mac (Consumables)","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Food-Orders-Harvey & Brockless","purchases":0},{"invlocation__app_location__name":"Liverpool","item__category__name":"Food-Orders-Brakes (Meat)","purchases":625.67},{"invlocation__app_location__name":"Liverpool","item__category__name":"Drink/Draft","purchases":0},{"invlocation__app_location__name":"York","item__category__name":"Food-Orders-Brakes (Fresh)","purchases":683.12},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food-Orders-Brakes (Frozen)","purchases":1107.98},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Drink-Orders-Brakes -(Drinks)","purchases":37.78},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food/Mods/Add","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Menu/Build Drink","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Orders-Mac Prime costs","purchases":78.68},{"invlocation__app_location__name":"Birmingham","item__category__name":"Food-Orders-Brakes (Fresh)","purchases":348.82},{"invlocation__app_location__name":"Leeds","item__category__name":"Drink-Orders-LWC Alcohol","purchases":56.82},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food-Orders-Brakes (Fresh)","purchases":683.24},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food-Orders-Brakes (Meat)","purchases":1011.24},{"invlocation__app_location__name":"Durham","item__category__name":"Drink-Orders-Brakes -(Drinks)","purchases":0},{"invlocation__app_location__name":"York","item__category__name":"Menu/Build/Prep","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food/Orders-Amazon","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Drink/spirits/liqueurs","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Food-Orders-Original Bakehouse","purchases":389.49},{"invlocation__app_location__name":"Leeds","item__category__name":"Drink-Orders-Brakes -(Drinks)","purchases":0},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Drink-Orders-ABCO","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Drink/Soft","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Drink-Orders-Allendale","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food-Orders-Harvey & Brockless","purchases":260.25},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food-Orders-Brakes","purchases":163.92},{"invlocation__app_location__name":"Nottingham","item__category__name":"Drink-Orders-Allendale","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food-Orders-Brakes (Fresh)","purchases":252.34},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food-Orders-Brakes","purchases":19.33},{"invlocation__app_location__name":"Nottingham","item__category__name":"Drink-Orders-ABCO","purchases":0},{"invlocation__app_location__name":"York","item__category__name":"Food/Sides","purchases":159.79},{"invlocation__app_location__name":"Cardiff","item__category__name":"Orders-Mac (Consumables)","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Drink-Orders-Matthew Clark","purchases":54.75},{"invlocation__app_location__name":"Durham","item__category__name":"Food-Orders-Brakes (Frozen)","purchases":955.11},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food/Orders-Amazon","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Orders-Mac Prime costs","purchases":145.2},{"invlocation__app_location__name":"Leeds","item__category__name":"Food-Orders-Brakes (Frozen)","purchases":808.12},{"invlocation__app_location__name":"Cardiff","item__category__name":"Drink-order-HQ","purchases":0},{"invlocation__app_location__name":"Birmingham","item__category__name":"Drink-order-HQ","purchases":0},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Menu/Build/Prep","purchases":0},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Orders-Mac (Consumables)","purchases":0},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food/sides/Dirty","purchases":0},{"invlocation__app_location__name":"Leeds","item__category__name":"Food-Orders-Harvey & Brockless","purchases":266.4},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Crosbys","purchases":52.44},{"invlocation__app_location__name":"Liverpool","item__category__name":"OIL-Orders-Used oil","purchases":0},{"invlocation__app_location__name":"York","item__category__name":"OIL-Orders-Used oil","purchases":0},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food-Orders-Deli Fresh","purchases":299.36},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food/Orders-Brakes FOH","purchases":94.29},{"invlocation__app_location__name":"Cardiff","item__category__name":"Orders-Mac Prime costs","purchases":0},{"invlocation__app_location__name":"Liverpool","item__category__name":"Orders-Mac Prime costs","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Drink-Orders-LWC","purchases":650.56},{"invlocation__app_location__name":"Leeds","item__category__name":"Menu/Build/Prep","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food-Orders-Deli Fresh","purchases":363.71},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food/Orders-Brakes FOH","purchases":56.4},{"invlocation__app_location__name":"Birmingham","item__category__name":"Food-Orders-Aubrey Allen","purchases":1267.81},{"invlocation__app_location__name":"Durham","item__category__name":"Oil-Orders-OLLECO","purchases":230},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Drink-Orders-LWC","purchases":586.1},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food-Orders-Brakes (Frozen)","purchases":494.7},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Food/Sauce","purchases":0},{"invlocation__app_location__name":"York","item__category__name":"Food-Orders-Brakes (Dry)","purchases":154.75},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food-Orders-HQ (Food)","purchases":0},{"invlocation__app_location__name":"Leeds","item__category__name":"Food-Orders-Original Bakehouse","purchases":459.42},{"invlocation__app_location__name":"Leeds","item__category__name":"Drink-Orders-Allendale","purchases":0},{"invlocation__app_location__name":"Leeds","item__category__name":"Orders-Mac Prime costs","purchases":0},{"invlocation__app_location__name":"Durham","item__category__name":"Food/Orders-Brakes FOH","purchases":12.81},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Menu/Build/Prep","purchases":0},{"invlocation__app_location__name":"Liverpool","item__category__name":"Menu/Build/Prep","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food-Orders-Bidfood-FOH","purchases":0},{"invlocation__app_location__name":"Cardiff","item__category__name":"Oil-Orders-OLLECO","purchases":0},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food-Orders-Brakes (Fresh)","purchases":582.23},{"invlocation__app_location__name":"Glasgow","item__category__name":"Drink-order-HQ","purchases":0},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food-Orders-Brakes (Dry)","purchases":100.51},{"invlocation__app_location__name":"Glasgow","item__category__name":"Drink-Orders-ABCO","purchases":158.8},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food/Starter","purchases":0},{"invlocation__app_location__name":"York","item__category__name":"Food-Orders-Brakes","purchases":48.99},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food-Orders-Harvey & Brockless","purchases":340.84},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Food/Sides","purchases":210.8},{"invlocation__app_location__name":"York","item__category__name":"Crosbys","purchases":138},{"invlocation__app_location__name":"Newcastle (Centre)","item__category__name":"Drink-Orders-Allendale","purchases":0},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food-Orders-Deli Fresh","purchases":236.33},{"invlocation__app_location__name":"Nottingham","item__category__name":"Drink-order-HQ","purchases":0},{"invlocation__app_location__name":"Leeds","item__category__name":"Food-Orders-HQ (Food)","purchases":0},{"invlocation__app_location__name":"Durham","item__category__name":"Food-Orders-Brakes (Fresh)","purchases":512.44},{"invlocation__app_location__name":"Newcastle (Jesmond)","item__category__name":"Oil-Orders-OLLECO","purchases":472.08},{"invlocation__app_location__name":"York","item__category__name":"Food-Orders-Brakes (Meat)","purchases":1165.47},{"invlocation__app_location__name":"Nottingham","item__category__name":"Drink-Orders-Brakes -(Drinks)","purchases":38.94},{"invlocation__app_location__name":"Birmingham","item__category__name":"Orders-Crosbys (Packaging)","purchases":15.01},{"invlocation__app_location__name":"Liverpool","item__category__name":"Menu/FowlPlay/Handhelds&Trays","purchases":0},{"invlocation__app_location__name":"Leeds","item__category__name":"Food/Orders-Brakes FOH","purchases":126.7},{"invlocation__app_location__name":"Cardiff","item__category__name":"Food-Orders-Brakes","purchases":53.49},{"invlocation__app_location__name":"Glasgow","item__category__name":"Food/sides/Deliverect","purchases":0},{"invlocation__app_location__name":"York","item__category__name":"Orders-Crosbys","purchases":240.79},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food-Orders-Brakes (Meat)","purchases":582.02},{"invlocation__app_location__name":"York","item__category__name":"Food-Orders-Aubrey Allen","purchases":1767.46},{"invlocation__app_location__name":"Leeds","item__category__name":"Food/Orders-Amazon","purchases":0},{"invlocation__app_location__name":"Durham","item__category__name":"Drink-Orders-ABCO","purchases":75.24},{"invlocation__app_location__name":"Leeds (Headingley)","item__category__name":"Food-Orders-Brakes (Meat)","purchases":403.04},{"invlocation__app_location__name":"Birmingham","item__category__name":"Orders-Crosbys","purchases":74.07},{"invlocation__app_location__name":"Birmingham","item__category__name":"Food-Orders-Bidfood-FOH","purchases":32.96},{"invlocation__app_location__name":"Nottingham","item__category__name":"Food-Orders-Harvey & Brockless","purchases":126.36},{"invlocation__app_location__name":"Edinburgh","item__category__name":"Food-Orders-Aubrey Allen","purchases":2221.47}]},"purchases|2026-07-01|2026-07-14|[\"location\"]":{"data":[{"invlocation__app_location__name":"Leeds","purchases":13428.43},{"invlocation__app_location__name":"Newcastle (Centre)","purchases":13836.82},{"invlocation__app_location__name":"Durham","purchases":11252.64},{"invlocation__app_location__name":"Edinburgh","purchases":17564.21},{"invlocation__app_location__name":"Leeds (Headingley)","purchases":7713.01},{"invlocation__app_location__name":"Glasgow","purchases":14216.24},{"invlocation__app_location__name":"Liverpool","purchases":8533.56},{"invlocation__app_location__name":"Birmingham","purchases":11367.55},{"invlocation__app_location__name":"Newcastle (Jesmond)","purchases":13949.15},{"invlocation__app_location__name":"Cardiff","purchases":12062.2},{"invlocation__app_location__name":"York","purchases":13366.93},{"invlocation__app_location__name":"Nottingham","purchases":8053.8}]},"avg_rating|2026-07-06|2026-07-12|[\"location\",\"social_source\"]":{"data":[{"sociallocation__location__name":"Birmingham","source_id":"Google My Business","avg_rating":4.571428571428571},{"sociallocation__location__name":"Birmingham","source_id":"Tripadvisor V3","avg_rating":4},{"sociallocation__location__name":"Cardiff","source_id":"Google My Business","avg_rating":4.25},{"sociallocation__location__name":"Durham","source_id":"Google My Business","avg_rating":5},{"sociallocation__location__name":"Durham","source_id":"Tripadvisor V3","avg_rating":2},{"sociallocation__location__name":"Edinburgh","source_id":"Google My Business","avg_rating":4.428571428571429},{"sociallocation__location__name":"Edinburgh","source_id":"Tripadvisor V3","avg_rating":5},{"sociallocation__location__name":"Glasgow","source_id":"Google My Business","avg_rating":4.75},{"sociallocation__location__name":"Leeds","source_id":"Google My Business","avg_rating":4.875},{"sociallocation__location__name":"Leeds (Headingley)","source_id":"Google My Business","avg_rating":4.8},{"sociallocation__location__name":"Liverpool","source_id":"Google My Business","avg_rating":4.5},{"sociallocation__location__name":"Newcastle (Centre)","source_id":"Google My Business","avg_rating":4.642857142857143},{"sociallocation__location__name":"Newcastle (Jesmond)","source_id":"Google My Business","avg_rating":5},{"sociallocation__location__name":"Nottingham","source_id":"Google My Business","avg_rating":4.809523809523809},{"sociallocation__location__name":"Nottingham","source_id":"Tripadvisor V3","avg_rating":1},{"sociallocation__location__name":"York","source_id":"Google My Business","avg_rating":4.794117647058823},{"sociallocation__location__name":"York","source_id":"Tripadvisor V3","avg_rating":5}]},"num_reviews|2026-07-06|2026-07-12|[\"location\",\"social_source\"]":{"data":[{"source_id":"Google My Business","sociallocation__location__name":"Birmingham","num_reviews":28},{"source_id":"Google My Business","sociallocation__location__name":"Cardiff","num_reviews":8},{"source_id":"Google My Business","sociallocation__location__name":"Durham","num_reviews":3},{"source_id":"Google My Business","sociallocation__location__name":"Edinburgh","num_reviews":21},{"source_id":"Google My Business","sociallocation__location__name":"Glasgow","num_reviews":8},{"source_id":"Google My Business","sociallocation__location__name":"Leeds","num_reviews":16},{"source_id":"Google My Business","sociallocation__location__name":"Leeds (Headingley)","num_reviews":5},{"source_id":"Google My Business","sociallocation__location__name":"Liverpool","num_reviews":14},{"source_id":"Google My Business","sociallocation__location__name":"Newcastle (Centre)","num_reviews":14},{"source_id":"Google My Business","sociallocation__location__name":"Newcastle (Jesmond)","num_reviews":2},{"source_id":"Google My Business","sociallocation__location__name":"Nottingham","num_reviews":21},{"source_id":"Google My Business","sociallocation__location__name":"York","num_reviews":34},{"source_id":"Tripadvisor V3","sociallocation__location__name":"Birmingham","num_reviews":1},{"source_id":"Tripadvisor V3","sociallocation__location__name":"Durham","num_reviews":1},{"source_id":"Tripadvisor V3","sociallocation__location__name":"Edinburgh","num_reviews":1},{"source_id":"Tripadvisor V3","sociallocation__location__name":"Nottingham","num_reviews":1},{"source_id":"Tripadvisor V3","sociallocation__location__name":"York","num_reviews":1}]},"avg_rating|2026-06-29|2026-07-05|[\"location\",\"social_source\"]":{"data":[{"source_id":"Google My Business","sociallocation__location__name":"Birmingham","avg_rating":4.773584905660377},{"source_id":"Google My Business","sociallocation__location__name":"Cardiff","avg_rating":4.888888888888889},{"source_id":"Google My Business","sociallocation__location__name":"Durham","avg_rating":3},{"source_id":"Google My Business","sociallocation__location__name":"Edinburgh","avg_rating":4.71875},{"source_id":"Google My Business","sociallocation__location__name":"Glasgow","avg_rating":5},{"source_id":"Google My Business","sociallocation__location__name":"Leeds","avg_rating":4.444444444444445},{"source_id":"Google My Business","sociallocation__location__name":"Leeds (Headingley)","avg_rating":4.428571428571429},{"source_id":"Google My Business","sociallocation__location__name":"Liverpool","avg_rating":4.818181818181818},{"source_id":"Google My Business","sociallocation__location__name":"Newcastle (Centre)","avg_rating":5},{"source_id":"Google My Business","sociallocation__location__name":"Newcastle (Jesmond)","avg_rating":5},{"source_id":"Google My Business","sociallocation__location__name":"Nottingham","avg_rating":4.916666666666667},{"source_id":"Google My Business","sociallocation__location__name":"York","avg_rating":4.714285714285714},{"source_id":"Tripadvisor V3","sociallocation__location__name":"Durham","avg_rating":5},{"source_id":"Tripadvisor V3","sociallocation__location__name":"York","avg_rating":1}]},"num_reviews|2026-06-29|2026-07-05|[\"location\",\"social_source\"]":{"data":[{"source_id":"Google My Business","sociallocation__location__name":"Birmingham","num_reviews":53},{"source_id":"Google My Business","sociallocation__location__name":"Cardiff","num_reviews":18},{"source_id":"Google My Business","sociallocation__location__name":"Durham","num_reviews":2},{"source_id":"Google My Business","sociallocation__location__name":"Edinburgh","num_reviews":32},{"source_id":"Google My Business","sociallocation__location__name":"Glasgow","num_reviews":8},{"source_id":"Google My Business","sociallocation__location__name":"Leeds","num_reviews":27},{"source_id":"Google My Business","sociallocation__location__name":"Leeds (Headingley)","num_reviews":7},{"source_id":"Google My Business","sociallocation__location__name":"Liverpool","num_reviews":11},{"source_id":"Google My Business","sociallocation__location__name":"Newcastle (Centre)","num_reviews":3},{"source_id":"Google My Business","sociallocation__location__name":"Newcastle (Jesmond)","num_reviews":5},{"source_id":"Google My Business","sociallocation__location__name":"Nottingham","num_reviews":24},{"source_id":"Google My Business","sociallocation__location__name":"York","num_reviews":28},{"source_id":"Tripadvisor V3","sociallocation__location__name":"Durham","num_reviews":1},{"source_id":"Tripadvisor V3","sociallocation__location__name":"York","num_reviews":1}]},"avg_rating|2026-07-01|2026-07-14|[\"location\",\"social_source\"]":{"data":[{"sociallocation__location__name":"Birmingham","source_id":"Google My Business","avg_rating":4.728395061728395},{"sociallocation__location__name":"Birmingham","source_id":"Tripadvisor V3","avg_rating":4},{"sociallocation__location__name":"Cardiff","source_id":"Google My Business","avg_rating":4.611111111111111},{"sociallocation__location__name":"Durham","source_id":"Google My Business","avg_rating":5},{"sociallocation__location__name":"Durham","source_id":"Tripadvisor V3","avg_rating":3.5},{"sociallocation__location__name":"Edinburgh","source_id":"Google My Business","avg_rating":4.5},{"sociallocation__location__name":"Edinburgh","source_id":"Tripadvisor V3","avg_rating":5},{"sociallocation__location__name":"Glasgow","source_id":"Google My Business","avg_rating":4.857142857142857},{"sociallocation__location__name":"Leeds","source_id":"Google My Business","avg_rating":4.657894736842105},{"sociallocation__location__name":"Leeds (Headingley)","source_id":"Google My Business","avg_rating":4.615384615384615},{"sociallocation__location__name":"Liverpool","source_id":"Google My Business","avg_rating":4.555555555555555},{"sociallocation__location__name":"Newcastle (Centre)","source_id":"Google My Business","avg_rating":4.722222222222222},{"sociallocation__location__name":"Newcastle (Jesmond)","source_id":"Google My Business","avg_rating":5},{"sociallocation__location__name":"Nottingham","source_id":"Google My Business","avg_rating":4.84},{"sociallocation__location__name":"Nottingham","source_id":"Tripadvisor V3","avg_rating":1},{"sociallocation__location__name":"York","source_id":"Google My Business","avg_rating":4.783333333333333},{"sociallocation__location__name":"York","source_id":"Tripadvisor V3","avg_rating":5}]},"num_reviews|2026-07-01|2026-07-14|[\"location\",\"social_source\"]":{"data":[{"sociallocation__location__name":"Birmingham","source_id":"Google My Business","num_reviews":81},{"sociallocation__location__name":"Birmingham","source_id":"Tripadvisor V3","num_reviews":1},{"sociallocation__location__name":"Cardiff","source_id":"Google My Business","num_reviews":18},{"sociallocation__location__name":"Durham","source_id":"Google My Business","num_reviews":5},{"sociallocation__location__name":"Durham","source_id":"Tripadvisor V3","num_reviews":2},{"sociallocation__location__name":"Edinburgh","source_id":"Google My Business","num_reviews":44},{"sociallocation__location__name":"Edinburgh","source_id":"Tripadvisor V3","num_reviews":1},{"sociallocation__location__name":"Glasgow","source_id":"Google My Business","num_reviews":14},{"sociallocation__location__name":"Leeds","source_id":"Google My Business","num_reviews":38},{"sociallocation__location__name":"Leeds (Headingley)","source_id":"Google My Business","num_reviews":13},{"sociallocation__location__name":"Liverpool","source_id":"Google My Business","num_reviews":18},{"sociallocation__location__name":"Newcastle (Centre)","source_id":"Google My Business","num_reviews":18},{"sociallocation__location__name":"Newcastle (Jesmond)","source_id":"Google My Business","num_reviews":8},{"sociallocation__location__name":"Nottingham","source_id":"Google My Business","num_reviews":50},{"sociallocation__location__name":"Nottingham","source_id":"Tripadvisor V3","num_reviews":1},{"sociallocation__location__name":"York","source_id":"Google My Business","num_reviews":60},{"sociallocation__location__name":"York","source_id":"Tripadvisor V3","num_reviews":1}]},"avg_rating|2026-06-01|2026-06-14|[\"location\",\"social_source\"]":{"data":[{"source_id":"Google My Business","sociallocation__location__name":"Birmingham","avg_rating":4.845454545454546},{"source_id":"Google My Business","sociallocation__location__name":"Cardiff","avg_rating":4.9},{"source_id":"Google My Business","sociallocation__location__name":"Durham","avg_rating":4.285714285714286},{"source_id":"Google My Business","sociallocation__location__name":"Edinburgh","avg_rating":4.830188679245283},{"source_id":"Google My Business","sociallocation__location__name":"Glasgow","avg_rating":4.7272727272727275},{"source_id":"Google My Business","sociallocation__location__name":"Leeds","avg_rating":4.892857142857143},{"source_id":"Google My Business","sociallocation__location__name":"Leeds (Headingley)","avg_rating":4.884615384615385},{"source_id":"Google My Business","sociallocation__location__name":"Liverpool","avg_rating":3.9166666666666665},{"source_id":"Google My Business","sociallocation__location__name":"Newcastle (Centre)","avg_rating":5},{"source_id":"Google My Business","sociallocation__location__name":"Newcastle (Jesmond)","avg_rating":4.636363636363637},{"source_id":"Google My Business","sociallocation__location__name":"Nottingham","avg_rating":4.733333333333333},{"source_id":"Google My Business","sociallocation__location__name":"York","avg_rating":4.576923076923077},{"source_id":"Tripadvisor V3","sociallocation__location__name":"Birmingham","avg_rating":1},{"source_id":"Tripadvisor V3","sociallocation__location__name":"Cardiff","avg_rating":3.6},{"source_id":"Tripadvisor V3","sociallocation__location__name":"Newcastle (Centre)","avg_rating":2.6666666666666665},{"source_id":"Tripadvisor V3","sociallocation__location__name":"Newcastle (Jesmond)","avg_rating":5},{"source_id":"Tripadvisor V3","sociallocation__location__name":"York","avg_rating":5}]},"num_reviews|2026-06-01|2026-06-14|[\"location\",\"social_source\"]":{"data":[{"source_id":"Google My Business","sociallocation__location__name":"Birmingham","num_reviews":110},{"source_id":"Google My Business","sociallocation__location__name":"Cardiff","num_reviews":70},{"source_id":"Google My Business","sociallocation__location__name":"Durham","num_reviews":7},{"source_id":"Google My Business","sociallocation__location__name":"Edinburgh","num_reviews":53},{"source_id":"Google My Business","sociallocation__location__name":"Glasgow","num_reviews":22},{"source_id":"Google My Business","sociallocation__location__name":"Leeds","num_reviews":28},{"source_id":"Google My Business","sociallocation__location__name":"Leeds (Headingley)","num_reviews":26},{"source_id":"Google My Business","sociallocation__location__name":"Liverpool","num_reviews":12},{"source_id":"Google My Business","sociallocation__location__name":"Newcastle (Centre)","num_reviews":13},{"source_id":"Google My Business","sociallocation__location__name":"Newcastle (Jesmond)","num_reviews":11},{"source_id":"Google My Business","sociallocation__location__name":"Nottingham","num_reviews":30},{"source_id":"Google My Business","sociallocation__location__name":"York","num_reviews":26},{"source_id":"Tripadvisor V3","sociallocation__location__name":"Birmingham","num_reviews":1},{"source_id":"Tripadvisor V3","sociallocation__location__name":"Cardiff","num_reviews":5},{"source_id":"Tripadvisor V3","sociallocation__location__name":"Newcastle (Centre)","num_reviews":3},{"source_id":"Tripadvisor V3","sociallocation__location__name":"Newcastle (Jesmond)","num_reviews":1},{"source_id":"Tripadvisor V3","sociallocation__location__name":"York","num_reviews":2}]}}};
+
+function __staticOk(body){
+  return Promise.resolve({ isError:false, structuredContent: body, content:[{type:'text', text: JSON.stringify(body)}] });
+}
+function __staticErr(msg){
+  return Promise.resolve({ isError:true, content:[{type:'text', text: msg}] });
+}
+// Replays every Tenzo call the dashboard makes against data captured once, for real, on
+// STATIC_CAPTURED_LABEL. No network/MCP connection is used or required — this is a frozen copy.
+function __staticReplay(name, args){
+  if (name.includes('get_analytics_context')) return __staticOk(STATIC_DATA.ctx);
+  if (name.includes('get_locations')) return __staticOk(STATIC_DATA.locs);
+  if (name.includes('list_logs')) return __staticOk(STATIC_DATA.logs);
+  if (name.includes('list_reviews')) return __staticOk(STATIC_DATA.reviews);
+  if (name.includes('query_metrics')){
+    const key = args.metric+'|'+args.start_date+'|'+args.end_date+'|'+JSON.stringify(args.dimensions||['location']);
+    const hit = STATIC_DATA.metrics[key];
+    if (hit) return __staticOk(hit);
+    // Any call not captured in this snapshot (e.g. per-site item-level wastage, which this
+    // static export deliberately omits — see the banner and in-page notes) returns no rows
+    // rather than an error, so the page still renders cleanly.
+    return __staticOk({ data: [] });
+  }
+  return __staticErr('Not available in this static snapshot.');
+}
+
+</script>
+<script>
+(function(){
+
+  const CCY_SYMBOLS = { GBP:'£', USD:'$', EUR:'€' };
+  let CCY = '£';
+
+  const fmtMoney = (n) => {
+    if (n===null || n===undefined || isNaN(n)) return 'n/a';
+    const sign = n<0 ? '-' : '';
+    return sign + CCY + Math.abs(n).toLocaleString('en-GB',{minimumFractionDigits:0, maximumFractionDigits:0});
+  };
+  const fmtPct = (n, dp=1) => (n===null||n===undefined||isNaN(n)) ? 'n/a' : (n>=0?'':'') + n.toFixed(dp) + '%';
+  const fmtSignedPct = (n, dp=1) => {
+    if (n===null||n===undefined||isNaN(n)) return 'n/a';
+    return (n>0?'+':'') + n.toFixed(dp) + '%';
+  };
+
+  function deltaClass(n, invert){
+    if (n===null||n===undefined||isNaN(n)) return 'flat';
+    if (invert) n = -n;
+    if (n > 0.4) return 'pos';
+    if (n < -0.4) return 'neg';
+    return 'flat';
+  }
+
+  // ---------- date helpers (all dates handled as UTC midnight to avoid TZ drift) ----------
+  const parseISO = (s) => new Date(s + 'T00:00:00Z');
+  const toISO = (d) => d.toISOString().slice(0,10);
+  const addDays = (d, n) => { const r = new Date(d); r.setUTCDate(r.getUTCDate()+n); return r; };
+  const isoDow = (d) => { const day = d.getUTCDay(); return day===0 ? 7 : day; }; // Mon=1..Sun=7
+  const fmtHuman = (d) => d.toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric', timeZone:'UTC'});
+
+  // ---------- generic row-field extractor (Tenzo field names vary by metric/model) ----------
+  function extractRow(row, metricKey){
+    let location=null, discountType=null, housePart=null;
+    for (const k of Object.keys(row)){
+      if (k===metricKey) continue;
+      const lk = k.toLowerCase();
+      if (lk.includes('housepart')) housePart = row[k];
+      else if (lk.includes('discount')) discountType = row[k];
+      else if (lk.includes('location')) location = row[k];
+    }
+    return { location, discountType, housePart, value: Number(row[metricKey])||0 };
+  }
+
+  function sumByLocation(rows, metricKey){
+    const out = {};
+    for (const r of rows){
+      const {location, value} = extractRow(r, metricKey);
+      if (!location) continue;
+      out[location] = (out[location]||0) + value;
+    }
+    return out;
+  }
+
+  function classifyDiscount(name){
+    const n = (name||'').toLowerCase();
+    if (n.includes('discount') || n.includes('loyalty')) return 'discount';
+    return 'comp';
+  }
+
+  // Weekly labour % targets by site (from ops target sheet). FOH and BOH each get half the site target.
+  const LABOUR_TARGETS = {
+    'Birmingham': 30,
+    'Cardiff': 32,
+    'Durham': 32,
+    'Edinburgh': 32,
+    'Glasgow': 32,
+    'Leeds': 32,
+    'Leeds (Headingley)': 34,
+    'Liverpool': 32,
+    'Newcastle (Centre)': 31.8,
+    'Newcastle (Jesmond)': 30,
+    'Nottingham': 32,
+    'York': 32
+  };
+
+  // at/below target = good (green), above target = bad (red). Returns '' if no target available.
+  function ragClass(value, target){
+    if (value==null || target==null || isNaN(value) || isNaN(target)) return '';
+    return value <= target ? 'rag-good' : 'rag-bad';
+  }
+
+  function normSource(s){
+    const n = (s||'').toLowerCase();
+    if (n.includes('google')) return 'Google';
+    if (n.includes('tripadvisor') || n.includes('trip advisor')) return 'TripAdvisor';
+    return s || 'Other';
+  }
+
+  // Favouritetable has no Tenzo/API integration, so its rating + review count are captured
+  // manually from https://www.favouritetable.com and baked in here rather than fetched live.
+  // No historical monthly split or individual review text is exposed by the site, so there is
+  // no month-on-month trend and no review-level negative-review list for this platform — only
+  // a "rating below 4.0" flag as a proxy signal. Re-capture periodically to keep this current.
+  const FAVOURITETABLE_CAPTURED = '2026-07-15';
+  const FAVOURITETABLE_SNAPSHOT = {
+    'Birmingham':          { rating: 4.2, reviews: 788 },
+    'Cardiff':             { rating: 4.1, reviews: 1113 },
+    'Durham':              { rating: 4.3, reviews: 775 },
+    'Edinburgh':           { rating: 3.9, reviews: 459 },
+    'Glasgow':             { rating: 4.2, reviews: 875 },
+    'Leeds':               { rating: 4.0, reviews: 97 },
+    'Leeds (Headingley)':  { rating: 4.2, reviews: 424 },
+    'Liverpool':           { rating: 4.1, reviews: 668 },
+    'Newcastle (Centre)':  { rating: 4.4, reviews: 1290 },
+    'Newcastle (Jesmond)': { rating: 4.7, reviews: 319 },
+    'Nottingham':          { rating: 4.3, reviews: 1220 },
+    'York':                { rating: 4.0, reviews: 727 }
+  };
+
+  // Inventory-category bucketing for Purchases: Tenzo's inventory_category values are free-text
+  // vendor/type labels (e.g. "Food-Orders-Aubrey Allen", "Drink-Orders-LWC", "Food/Sides"). Only
+  // categories that actually say "order" count toward Food/Drink, plus a few manual overrides:
+  // "Food/Orders-Brakes FOH", "Food-Orders-Bidfood-FOH" and "Drink-Orders-Deli Fresh (FOH)" are
+  // FOH fridge-stock categories that are really soft drinks (the last one already matches the
+  // generic Drink rule, but it's pinned explicitly so it stays Drink even if that rule changes);
+  // "Food/Sides" isn't an "order" line but is still real food spend, so it's moved to Food. Oil
+  // is its own bucket: OLLECO is the purchase, "Used oil" is a
+  // recycling credit (usually negative) shown as "Waste Oil" alongside it. Consumables is now
+  // narrow and explicit — only categories naming the Mac or Crosbys vendors. Anything else (the
+  // mostly-unused modifier-style categories like "Drink/Wine", "Menu/Build" etc.) isn't counted
+  // in any bucket and doesn't contribute to Total Purchases.
+  function classifyPurchaseCategory(name){
+    const n = (name||'').toLowerCase();
+    if (n === 'food/sides') return 'Food';
+    if (n === 'food/orders-brakes foh' || n === 'food-orders-bidfood-foh' || n === 'drink-orders-deli fresh (foh)') return 'Drink';
+    if (n.includes('olleco') || n.includes('used oil')) return 'Oil';
+    const hasOrder = n.includes('order');
+    if (hasOrder && n.includes('drink')) return 'Drink';
+    if (hasOrder && n.includes('food')) return 'Food';
+    if (n.includes('mac') || n.includes('crosby')) return 'Consumables';
+    return null; // not tracked in any purchase bucket
+  }
+  // Wastage only ever shows up against Food or Drink categories (consumable/overhead categories
+  // consistently log zero wastage), so anything not explicitly "Drink" is treated as Food here —
+  // this is intentionally simpler than the purchase-side "order" rule above.
+  function classifyWastageBucket(name){
+    return (name||'').toLowerCase().includes('drink') ? 'Drink' : 'Food';
+  }
+  function extractCatRow(row, metricKey){
+    let location=null, category=null;
+    for (const k of Object.keys(row)){
+      if (k===metricKey) continue;
+      const lk = k.toLowerCase();
+      if (lk.includes('location')) location = row[k];
+      else if (lk.includes('category')) category = row[k];
+    }
+    return { location, category, value: Number(row[metricKey])||0 };
+  }
+  function extractItemRow(row, metricKey){
+    let location=null, item=null;
+    for (const k of Object.keys(row)){
+      if (k===metricKey) continue;
+      const lk = k.toLowerCase();
+      if (lk.includes('location')) location = row[k];
+      else if (lk.includes('item')) item = row[k];
+    }
+    return { location, item, value: Number(row[metricKey])||0 };
+  }
+
+  function fmtRating(n){ return (n==null||isNaN(n)) ? 'n/a' : n.toFixed(1)+' ★'; }
+  function fmtStars(n){
+    if (n==null||isNaN(n)) return '';
+    const full = Math.round(n);
+    return '★'.repeat(Math.max(0,Math.min(5,full))) + '☆'.repeat(5-Math.max(0,Math.min(5,full)));
+  }
+
+  // This dashboard fires a lot of individual Tenzo queries (last week, current/next week, MTD
+  // split into month-sized chunks, plus one wastage-by-item call per site) — 30+ in total, and
+  // the 12 per-site wastage calls land as one extra burst right after the main batch. Capping how
+  // many run *simultaneously* wasn't enough on its own: even at 3 concurrent, a fast-completing
+  // batch can still dispatch a new call every instant, which reads as a burst to a requests-per-
+  // second style limiter. So this also enforces a minimum gap between dispatching any two calls
+  // (a simple rate limiter, not just a concurrency cap), and gives rate-limited calls more,
+  // longer-spaced retries before giving up.
+  function createLimiter(concurrency, minGapMs){
+    let active = 0;
+    let lastDispatch = 0;
+    const queue = [];
+    function next(){
+      if (active >= concurrency || queue.length === 0) return;
+      const wait = Math.max(0, (lastDispatch + minGapMs) - Date.now());
+      setTimeout(() => {
+        if (active >= concurrency || queue.length === 0) return;
+        active++;
+        lastDispatch = Date.now();
+        const { fn, resolve, reject } = queue.shift();
+        fn().then(r => { active--; resolve(r); next(); }, e => { active--; reject(e); next(); });
+      }, wait);
+    }
+    return function runLimited(fn){
+      return new Promise((resolve, reject) => { queue.push({ fn, resolve, reject }); next(); });
+    };
+  }
+  const withLimit = createLimiter(2, 200);
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  async function callTool(name, args){
+    return withLimit(async () => {
+      let lastErr;
+      const maxAttempts = 5;
+      for (let attempt = 0; attempt < maxAttempts; attempt++){
+        if (attempt > 0) await sleep(600 * attempt);
+        try {
+          const r = await __staticReplay(name, args); // STATIC SNAPSHOT: replayed from captured data, no live MCP call
+          if (r.isError){
+            const msg = (r.content && r.content[0] && r.content[0].text) || 'tool error';
+            if (/rate limit/i.test(msg) && attempt < maxAttempts-1){ lastErr = new Error(msg); continue; }
+            throw new Error(msg);
+          }
+          return r.structuredContent ?? JSON.parse(r.content[0].text);
+        } catch(e){
+          lastErr = e;
+          if (!/rate limit/i.test(e.message||'') || attempt === maxAttempts-1) throw e;
+        }
+      }
+      throw lastErr;
+    });
+  }
+
+  // Threshold for the wastage "worth flagging" view: an item only appears if a single week's
+  // waste exceeds this, or if it was wasted more than once in the week. Shared between the data
+  // build (loadDashboard) and the render (renderPanel), so it lives at top level.
+  const WASTE_HIGHLIGHT_VALUE = 15;
+
+  const BUSINESS_ID = 1052;
+  const T = {
+    ctx: 'mcp__fb8e4b2b-4659-4c02-9dcc-f77247be2170__get_analytics_context',
+    locs: 'mcp__fb8e4b2b-4659-4c02-9dcc-f77247be2170__get_locations',
+    metrics: 'mcp__fb8e4b2b-4659-4c02-9dcc-f77247be2170__query_metrics',
+    logs: 'mcp__fb8e4b2b-4659-4c02-9dcc-f77247be2170__list_logs',
+    reviews: 'mcp__fb8e4b2b-4659-4c02-9dcc-f77247be2170__list_reviews'
+  };
+
+  async function loadDashboard(){
+    const errors = [];
+    const statusPill = document.getElementById('status-pill');
+    const content = document.getElementById('content');
+    const tabsEl = document.getElementById('tabs');
+
+    let ctx;
+    try {
+      ctx = await callTool(T.ctx, {});
+    } catch(e){
+      content.innerHTML = '<div class="err-banner">Could not connect to Tenzo: '+e.message+'</div>';
+      statusPill.textContent = 'Offline';
+      statusPill.classList.remove('live');
+      return;
+    }
+    CCY = CCY_SYMBOLS[ctx.currency] || (ctx.currency+' ');
+
+    const today = parseISO(ctx.date_periods.Today.startDate);
+    const dow = isoDow(today);
+    const thisWeekMonday = addDays(today, -(dow-1));
+    const thisWeekSunday = addDays(thisWeekMonday, 6);
+    const nextWeekMonday = addDays(thisWeekMonday, 7);
+    const nextWeekSunday = addDays(nextWeekMonday, 6);
+    const lastWeekSunday = addDays(thisWeekMonday, -1);
+    const lastWeekMonday = addDays(lastWeekSunday, -6);
+    const priorWeekSunday = addDays(lastWeekMonday, -1);
+    const priorWeekMonday = addDays(priorWeekSunday, -6);
+    const lyMonday = addDays(lastWeekMonday, -364);
+    const lySunday = addDays(lastWeekSunday, -364);
+
+    const firstOfThisMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
+
+    const RANGE = {
+      last:  { s: toISO(lastWeekMonday),  e: toISO(lastWeekSunday) },
+      prior: { s: toISO(priorWeekMonday), e: toISO(priorWeekSunday) },
+      ly:    { s: toISO(lyMonday),        e: toISO(lySunday) },
+      currentWeek: { s: toISO(thisWeekMonday), e: toISO(thisWeekSunday) },
+      nextWeek:     { s: toISO(nextWeekMonday), e: toISO(nextWeekSunday) }
+    };
+
+    // Month To Date period — taken from Tenzo's own date_periods so it tracks whatever "today"
+    // actually is, rather than assuming month boundaries. Quarter/Year To Date were removed
+    // entirely (not just from the UI) to cut down the number of Tenzo calls fired per load.
+    const dp = ctx.date_periods || {};
+    function periodRange(key, fallbackStart, fallbackEnd){
+      const p = dp[key];
+      return p ? { s: p.startDate, e: p.endDate } : { s: fallbackStart, e: fallbackEnd };
+    }
+    RANGE.mtd = periodRange('Month To Date', toISO(firstOfThisMonth), toISO(today));
+
+    // Equivalent day-count window in the previous calendar month, for a like-for-like
+    // "month to date vs previous month" review-score comparison (e.g. 1-14 Jul vs 1-14 Jun).
+    function daysInMonth(y,m){ return new Date(Date.UTC(y, m+1, 0)).getUTCDate(); }
+    const mtdEnd = parseISO(RANGE.mtd.e);
+    const mtdDayOfMonth = mtdEnd.getUTCDate();
+    const pmFirst = new Date(Date.UTC(mtdEnd.getUTCFullYear(), mtdEnd.getUTCMonth()-1, 1));
+    const pmEndDay = Math.min(mtdDayOfMonth, daysInMonth(pmFirst.getUTCFullYear(), pmFirst.getUTCMonth()));
+    RANGE.mtdPrior = { s: toISO(pmFirst), e: toISO(new Date(Date.UTC(pmFirst.getUTCFullYear(), pmFirst.getUTCMonth(), pmEndDay))) };
+    const mtdLabel = mtdEnd.toLocaleDateString('en-GB', {month:'short', year:'numeric', timeZone:'UTC'});
+    const mtdPriorLabel = pmFirst.toLocaleDateString('en-GB', {month:'short', year:'numeric', timeZone:'UTC'});
+
+    document.getElementById('week-subtitle').innerHTML =
+      'Week commencing <b>'+fmtHuman(lastWeekMonday)+'</b> &mdash; <span class="muted">'+fmtHuman(lastWeekMonday)+' to '+fmtHuman(lastWeekSunday)+'</span>';
+
+    // Kick off every query in parallel, swallow individual failures.
+    const q = (metric, range, dims) => callTool(T.metrics, {
+      business_id: BUSINESS_ID, metric, start_date: range.s, end_date: range.e, dimensions: dims||['location']
+    }).catch(e => { errors.push(metric+' ('+range.s+'): '+e.message); return {data:[]}; });
+
+    // Purchases-by-category rows grow with the length of the date range (more distinct
+    // location/category combinations show up over months than over a week), and a full
+    // Quarter/Year-to-date pull in one go can exceed the MCP tool's response size limit.
+    // Split any range into calendar-month chunks and fetch/merge those in parallel instead —
+    // each chunk stays roughly the size of the (known-safe) Month-to-Date query.
+    function monthChunks(startISO, endISO){
+      const start = parseISO(startISO), end = parseISO(endISO);
+      const chunks = [];
+      let cur = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), 1));
+      while (cur <= end){
+        const chunkStart = cur < start ? start : cur;
+        const monthEnd = new Date(Date.UTC(cur.getUTCFullYear(), cur.getUTCMonth()+1, 0));
+        const chunkEnd = monthEnd > end ? end : monthEnd;
+        chunks.push({ s: toISO(chunkStart), e: toISO(chunkEnd) });
+        cur = new Date(Date.UTC(cur.getUTCFullYear(), cur.getUTCMonth()+1, 1));
+      }
+      return chunks;
+    }
+    async function fetchPurchasesByCategoryChunked(range){
+      const chunks = monthChunks(range.s, range.e);
+      const results = await Promise.all(chunks.map(c => q('purchases', c, ['location','inventory_category'])));
+      const merged = [];
+      for (const r of results) merged.push(...(r.data||[]));
+      return { data: merged };
+    }
+
+    async function fetchAllReviews(range){
+      let page = 1, all = [];
+      while (page <= 6){
+        let res;
+        try {
+          res = await callTool(T.reviews, { business_id: BUSINESS_ID, date_from: range.s, date_to: range.e, page, page_size: 250 });
+        } catch(e){ errors.push('reviews: '+e.message); break; }
+        const results = res.results || [];
+        all = all.concat(results);
+        if (!res.next || results.length < 250) break;
+        page++;
+      }
+      return all;
+    }
+
+    const [
+      locsRes,
+      salesLast, salesPrior, salesLY, forecastLast,
+      laborLast, plannedLaborLast, laborByHousePart,
+      discountsLast, discountsByType,
+      wastageLast,
+      purchasesByCatLast,
+      logsRes,
+      forecastCurrentWeek, plannedLaborCurrentWeek,
+      forecastNextWeek, plannedLaborNextWeek,
+      avgRatingWeek, numReviewsWeek,
+      avgRatingWeekPrior, numReviewsWeekPrior,
+      avgRatingMTD, numReviewsMTD,
+      avgRatingMTDPrior, numReviewsMTDPrior,
+      lastWeekReviews,
+      salesMTD, laborMTD, purchasesMTDTotal
+    ] = await Promise.all([
+      callTool(T.locs, {business_id: BUSINESS_ID}).catch(e=>{errors.push('locations: '+e.message); return {results:[]};}),
+      q('sales', RANGE.last), q('sales', RANGE.prior), q('sales', RANGE.ly), q('forecast_sales', RANGE.last),
+      q('labor_cost', RANGE.last), q('planned_labor_cost', RANGE.last), q('labor_cost', RANGE.last, ['location','labor_house_part']),
+      q('discounts', RANGE.last), q('discounts', RANGE.last, ['location','discount_type']),
+      q('wastage', RANGE.last),
+      q('purchases', RANGE.last, ['location','inventory_category']),
+      callTool(T.logs, {business_id: BUSINESS_ID, date_from: RANGE.last.s, date_to: RANGE.last.e, page_size: 200}).catch(e=>{errors.push('logs: '+e.message); return {results:[]};}),
+      q('forecast_sales', RANGE.currentWeek), q('planned_labor_cost', RANGE.currentWeek),
+      q('forecast_sales', RANGE.nextWeek), q('planned_labor_cost', RANGE.nextWeek),
+      q('avg_rating', RANGE.last, ['location','social_source']), q('num_reviews', RANGE.last, ['location','social_source']),
+      q('avg_rating', RANGE.prior, ['location','social_source']), q('num_reviews', RANGE.prior, ['location','social_source']),
+      q('avg_rating', RANGE.mtd, ['location','social_source']), q('num_reviews', RANGE.mtd, ['location','social_source']),
+      q('avg_rating', RANGE.mtdPrior, ['location','social_source']), q('num_reviews', RANGE.mtdPrior, ['location','social_source']),
+      fetchAllReviews(RANGE.last),
+      q('sales', RANGE.mtd), q('labor_cost', RANGE.mtd), q('purchases', RANGE.mtd)
+      // STATIC SNAPSHOT NOTE: this frozen copy intentionally omits two granular, high-row-count
+      // queries that aren't practical to bake into a one-time export — category-level wastage
+      // ("Food-Orders-Brakes (Meat)" style breakdown) and the Month-To-Date purchase category
+      // split. Total Wastage and Total Purchases (MTD) are still shown, both from real Tenzo
+      // data; only the category/product-level breakdown underneath them is unavailable here.
+      // The live dashboard has the full breakdown.
+    ]);
+
+    const siteNames = (locsRes.results||[]).map(l=>l.name).sort();
+    const wastageHighlightsBySite = {};
+
+    const mtdStats = buildPeriodStats(salesMTD, laborMTD, purchasesMTDTotal, siteNames);
+
+    const mSalesLast   = sumByLocation(salesLast.data||[], 'sales');
+    const mSalesPrior  = sumByLocation(salesPrior.data||[], 'sales');
+    const mSalesLY     = sumByLocation(salesLY.data||[], 'sales');
+    const mForecast    = sumByLocation(forecastLast.data||[], 'forecast_sales');
+    const mLabor       = sumByLocation(laborLast.data||[], 'labor_cost');
+    const mPlannedLab  = sumByLocation(plannedLaborLast.data||[], 'planned_labor_cost');
+    const mDiscounts   = sumByLocation(discountsLast.data||[], 'discounts');
+    const mWastage     = sumByLocation(wastageLast.data||[], 'wastage');
+    const mForecastCW  = sumByLocation(forecastCurrentWeek.data||[], 'forecast_sales');
+    const mPlannedLabCW = sumByLocation(plannedLaborCurrentWeek.data||[], 'planned_labor_cost');
+    const mForecastNW  = sumByLocation(forecastNextWeek.data||[], 'forecast_sales');
+    const mPlannedLabNW = sumByLocation(plannedLaborNextWeek.data||[], 'planned_labor_cost');
+
+    // purchases split: {site: {Food,Drink,Consumables,Mac,Crosbys,Oil,WasteOil}} — last week.
+    // Consumables is only ever Mac + Crosbys now, so it's built directly from those two lines
+    // rather than a separate "everything else" catch-all.
+    const purchaseSplit = {};
+    for (const r of (purchasesByCatLast.data||[])){
+      const {location, category, value} = extractCatRow(r, 'purchases');
+      if (!location) continue;
+      purchaseSplit[location] = purchaseSplit[location] || {Food:0, Drink:0, Consumables:0, Mac:0, Crosbys:0, Oil:0, WasteOil:0};
+      const bucket = classifyPurchaseCategory(category);
+      if (bucket==null) continue; // not tracked in any purchase bucket
+      if (bucket==='Oil'){
+        if ((category||'').toLowerCase().includes('used oil')) purchaseSplit[location].WasteOil += value;
+        else purchaseSplit[location].Oil += value;
+      } else if (bucket==='Consumables'){
+        purchaseSplit[location].Consumables += value;
+        if (/mac/i.test(category||'')) purchaseSplit[location].Mac += value;
+        else if (/crosby/i.test(category||'')) purchaseSplit[location].Crosbys += value;
+      } else {
+        purchaseSplit[location][bucket] += value;
+      }
+    }
+
+    // STATIC SNAPSHOT: category-level wastage ("Food-Orders-Brakes (Meat)" style breakdown) isn't
+    // included in this frozen export (see the note above the Promise.all), so there's no Food vs
+    // Drink wastage split here — the Purchases & Wastage section below shows Total Wastage only,
+    // sourced from the real per-location wastage total (wastageLast) instead.
+    const wastageSplit = {};
+
+    // Month To Date stats per site: {site: {sales, labor, laborPct, totalPurchases}} — this static
+    // snapshot only has MTD purchases as a location total (no category split), unlike the live
+    // dashboard's Food/Drink/Consumables/Oil breakdown for this period.
+    function buildPeriodStats(salesData, laborData, purchData, names){
+      const s = sumByLocation(salesData.data||[], 'sales');
+      const l = sumByLocation(laborData.data||[], 'labor_cost');
+      const p = sumByLocation(purchData.data||[], 'purchases');
+      const out = {};
+      for (const name of names){
+        const sales = s[name] ?? null;
+        const labor = l[name] ?? null;
+        out[name] = {
+          sales, labor,
+          laborPct: (labor!=null && sales) ? (labor/sales*100) : null,
+          totalPurchases: p[name] ?? null
+        };
+      }
+      return out;
+    }
+
+    // house part split: {site: {FOH,BOH,Other}}
+    const houseSplit = {};
+    for (const r of (laborByHousePart.data||[])){
+      const {location, housePart, value} = extractRow(r, 'labor_cost');
+      if (!location) continue;
+      houseSplit[location] = houseSplit[location] || {FOH:0, BOH:0, Other:0};
+      const hp = (housePart||'').toUpperCase();
+      if (hp==='FOH') houseSplit[location].FOH += value;
+      else if (hp==='BOH') houseSplit[location].BOH += value;
+      else houseSplit[location].Other += value;
+    }
+
+    // discount breakdown: {site: {discount:x, comp:y, types:[{name,value}]}}
+    const discountSplit = {};
+    for (const r of (discountsByType.data||[])){
+      const {location, discountType, value} = extractRow(r, 'discounts');
+      if (!location) continue;
+      discountSplit[location] = discountSplit[location] || {discount:0, comp:0, types:{}};
+      const bucket = classifyDiscount(discountType);
+      discountSplit[location][bucket] += value;
+      discountSplit[location].types[discountType||'Other'] = (discountSplit[location].types[discountType||'Other']||0) + value;
+    }
+
+    // logs grouped by site
+    const logsBySite = {};
+    for (const l of (logsRes.results||[])){
+      const site = l.location_name || 'Unknown';
+      logsBySite[site] = logsBySite[site] || [];
+      logsBySite[site].push(l);
+    }
+
+    // reviews: monthly score map {site: {Google:{avg,count}}} (Favouritetable is a static snapshot, built separately)
+    function buildReviewScoreMap(avgData, countData){
+      const countMap = {};
+      for (const r of countData){
+        let loc=null, src=null;
+        for (const k of Object.keys(r)){
+          if (k==='num_reviews') continue;
+          if (k.toLowerCase().includes('location')) loc = r[k];
+          else if (k==='source_id') src = r[k];
+        }
+        if (!loc) continue;
+        countMap[loc+'|'+normSource(src)] = r.num_reviews;
+      }
+      const out = {};
+      for (const r of avgData){
+        let loc=null, src=null;
+        for (const k of Object.keys(r)){
+          if (k==='avg_rating') continue;
+          if (k.toLowerCase().includes('location')) loc = r[k];
+          else if (k==='source_id') src = r[k];
+        }
+        if (!loc) continue;
+        const platform = normSource(src);
+        out[loc] = out[loc] || {};
+        out[loc][platform] = { avg: r.avg_rating, count: countMap[loc+'|'+platform] || 0 };
+      }
+      return out;
+    }
+    const scoreWeek = buildReviewScoreMap(avgRatingWeek.data||[], numReviewsWeek.data||[]);
+    const scoreWeekPrior = buildReviewScoreMap(avgRatingWeekPrior.data||[], numReviewsWeekPrior.data||[]);
+    const scoreMTD = buildReviewScoreMap(avgRatingMTD.data||[], numReviewsMTD.data||[]);
+    const scoreMTDPrior = buildReviewScoreMap(avgRatingMTDPrior.data||[], numReviewsMTDPrior.data||[]);
+
+    // negative reviews (<=3 stars, with real text) from last week, grouped by site
+    const negativeBySite = {};
+    for (const r of lastWeekReviews){
+      const txt = (r.text||'').trim();
+      if (!txt || txt.toLowerCase()==='no text for this review') continue;
+      if ((r.rating||5) > 3) continue;
+      const site = r.location_name || 'Unknown';
+      negativeBySite[site] = negativeBySite[site] || [];
+      negativeBySite[site].push({ platform: normSource(r.source), name: r.name, rating: r.rating, text: txt, date: r.review_datetime });
+    }
+    for (const site in negativeBySite){ negativeBySite[site].sort((a,b)=> (a.date<b.date?1:-1)); }
+
+    function platformScore(name, platform, map){
+      const e = (map[name]||{})[platform];
+      return e || null;
+    }
+
+    function buildSiteReviews(name){
+      const out = {};
+      const week = platformScore(name, 'Google', scoreWeek);
+      const weekPrior = platformScore(name, 'Google', scoreWeekPrior);
+      const weekShiftPct = (week && week.avg!=null && weekPrior && weekPrior.avg) ? ((week.avg-weekPrior.avg)/weekPrior.avg*100) : null;
+      const mtd = platformScore(name, 'Google', scoreMTD);
+      const mtdPrior = platformScore(name, 'Google', scoreMTDPrior);
+      const mtdShiftPct = (mtd && mtd.avg!=null && mtdPrior && mtdPrior.avg) ? ((mtd.avg-mtdPrior.avg)/mtdPrior.avg*100) : null;
+      out.Google = {
+        weekAvg: week?week.avg:null, weekCount: week?week.count:0, weekShiftPct,
+        mtdAvg: mtd?mtd.avg:null, mtdCount: mtd?mtd.count:0, mtdShiftPct
+      };
+
+      const ft = FAVOURITETABLE_SNAPSHOT[name] || null;
+      out.Favouritetable = { avg: ft?ft.rating:null, count: ft?ft.reviews:0, static: true, captured: FAVOURITETABLE_CAPTURED };
+
+      out.negative = (negativeBySite[name]||[]).slice(0, 8);
+      return out;
+    }
+
+    function buildSite(name){
+      const sales = mSalesLast[name] ?? null;
+      const forecast = mForecast[name] ?? null;
+      const prior = mSalesPrior[name] ?? null;
+      const ly = mSalesLY[name] ?? null;
+      const labor = mLabor[name] ?? null;
+      const plannedLabor = mPlannedLab[name] ?? null;
+      const wastage = mWastage[name] ?? null;
+      const discounts = mDiscounts[name] ?? null;
+      const hs = houseSplit[name] || {FOH:0,BOH:0,Other:0};
+      const ds = discountSplit[name] || {discount:0, comp:0, types:{}};
+      const target = LABOUR_TARGETS[name] ?? null;
+      const halfTarget = target!=null ? target/2 : null;
+
+      const fcCW = mForecastCW[name] ?? null;
+      const plCW = mPlannedLabCW[name] ?? null;
+      const fcNW = mForecastNW[name] ?? null;
+      const plNW = mPlannedLabNW[name] ?? null;
+
+      const ps = purchaseSplit[name] || {Food:0, Drink:0, Consumables:0, Mac:0, Crosbys:0, Oil:0, WasteOil:0};
+      const ws = wastageSplit[name] || {Food:0, Drink:0};
+      // Waste Oil is a negative recycling credit, added back in here so Total Purchases reflects
+      // net spend rather than overstating it by the value of oil sold on for recycling.
+      const totalPurchases = ps.Food + ps.Drink + ps.Consumables + ps.Oil + ps.WasteOil;
+      const wastageHighlights = []; // not available in this static snapshot (see note above)
+      const wastageItems = [];
+
+      return {
+        name,
+        sales, forecast, prior, ly, labor, plannedLabor, wastage, discounts,
+        target, halfTarget,
+        vsForecastPct: (sales!=null && forecast) ? ((sales-forecast)/forecast*100) : null,
+        vsPriorPct: (sales!=null && prior) ? ((sales-prior)/prior*100) : null,
+        vsLYPct: (sales!=null && ly) ? ((sales-ly)/ly*100) : null,
+        actualLaborPct: (labor!=null && sales) ? (labor/sales*100) : null,
+        forecastLaborPct: (plannedLabor!=null && forecast) ? (plannedLabor/forecast*100) : null,
+        fohAmt: hs.FOH, bohAmt: hs.BOH,
+        fohPct: (sales) ? (hs.FOH/sales*100) : null,
+        bohPct: (sales) ? (hs.BOH/sales*100) : null,
+        otherPct: (sales && hs.Other) ? (hs.Other/sales*100) : 0,
+        wastagePct: (wastage!=null && sales) ? (wastage/sales*100) : null,
+        discountPct: (discounts!=null && sales) ? (discounts/sales*100) : null,
+        discountSplit: ds,
+        purchases: ps,
+        totalPurchases,
+        wastageByType: ws,
+        wastageFoodPctRev: (sales) ? (ws.Food/sales*100) : null,
+        wastageDrinkPctRev: (sales) ? (ws.Drink/sales*100) : null,
+        wastageFoodPctPurch: (ps.Food) ? (ws.Food/ps.Food*100) : null,
+        wastageDrinkPctPurch: (ps.Drink) ? (ws.Drink/ps.Drink*100) : null,
+        wastageHighlights,
+        wastageItems,
+        logs: logsBySite[name] || [],
+        currentWeek: {
+          plannedLabor: plCW, forecast: fcCW,
+          plannedLaborPct: (plCW!=null && fcCW) ? (plCW/fcCW*100) : null
+        },
+        nextWeek: {
+          plannedLabor: plNW, forecast: fcNW,
+          plannedLaborPct: (plNW!=null && fcNW) ? (plNW/fcNW*100) : null
+        },
+        reviews: buildSiteReviews(name)
+      };
+    }
+
+    const sites = siteNames.map(buildSite);
+
+    // Flag possible non-recording (meaningful purchases, zero wastage logged) or possible
+    // mis-keyed/duplicated entries (wastage-to-purchases ratio far above the group average).
+    // STATIC SNAPSHOT: uses the real per-location wastage total (s.wastage) rather than the
+    // Food+Drink category sum, since category-level wastage isn't fetched in this export.
+    {
+      const ratios = sites.map(s => {
+        const tw = s.wastage||0;
+        return s.totalPurchases>0 ? tw/s.totalPurchases*100 : null;
+      }).filter(v=>v!=null);
+      const avgRatio = ratios.length ? ratios.reduce((a,b)=>a+b,0)/ratios.length : null;
+      sites.forEach(s => {
+        const tw = s.wastage||0;
+        const ratio = s.totalPurchases>0 ? tw/s.totalPurchases*100 : null;
+        s.wastagePctOfPurchases = ratio;
+        s.wastageFlag = null;
+        if (s.totalPurchases > 50 && tw === 0) s.wastageFlag = 'zero';
+        else if (ratio!=null && avgRatio!=null && ratio > Math.max(avgRatio*1.8, 4)) s.wastageFlag = 'high';
+      });
+    }
+
+    function sumOrNull(arr){
+      const vals = arr.filter(v=>v!=null);
+      if (!vals.length) return null;
+      return vals.reduce((a,b)=>a+b,0);
+    }
+
+    const groupSales = sumOrNull(sites.map(s=>s.sales));
+    const groupForecast = sumOrNull(sites.map(s=>s.forecast));
+    const groupPrior = sumOrNull(sites.map(s=>s.prior));
+    const groupLY = sumOrNull(sites.map(s=>s.ly));
+    const groupLabor = sumOrNull(sites.map(s=>s.labor));
+    const groupPlannedLabor = sumOrNull(sites.map(s=>s.plannedLabor));
+    const groupWastage = sumOrNull(sites.map(s=>s.wastage));
+    const groupDiscounts = sumOrNull(sites.map(s=>s.discounts));
+    const groupFOH = sumOrNull(sites.map(s=> (houseSplit[s.name]||{}).FOH ?? null));
+    const groupBOH = sumOrNull(sites.map(s=> (houseSplit[s.name]||{}).BOH ?? null));
+    const groupOther = sumOrNull(sites.map(s=> (houseSplit[s.name]||{}).Other ?? null));
+    const groupDiscountTypeD = sumOrNull(sites.map(s=>s.discountSplit.discount));
+    const groupDiscountTypeC = sumOrNull(sites.map(s=>s.discountSplit.comp));
+    const groupPlannedLaborCW = sumOrNull(sites.map(s=>s.currentWeek.plannedLabor));
+    const groupForecastCW = sumOrNull(sites.map(s=>s.currentWeek.forecast));
+    const groupPlannedLaborNW = sumOrNull(sites.map(s=>s.nextWeek.plannedLabor));
+    const groupForecastNW = sumOrNull(sites.map(s=>s.nextWeek.forecast));
+
+    const groupPurchases = {
+      Food: sumOrNull(sites.map(s=>s.purchases.Food))||0,
+      Drink: sumOrNull(sites.map(s=>s.purchases.Drink))||0,
+      Consumables: sumOrNull(sites.map(s=>s.purchases.Consumables))||0,
+      Mac: sumOrNull(sites.map(s=>s.purchases.Mac))||0,
+      Crosbys: sumOrNull(sites.map(s=>s.purchases.Crosbys))||0,
+      Oil: sumOrNull(sites.map(s=>s.purchases.Oil))||0,
+      WasteOil: sumOrNull(sites.map(s=>s.purchases.WasteOil))||0
+    };
+    // Waste Oil (negative) is added back in so Total Purchases reflects net spend.
+    const groupTotalPurchases = groupPurchases.Food + groupPurchases.Drink + groupPurchases.Consumables + groupPurchases.Oil + groupPurchases.WasteOil;
+    const groupWastageByType = {
+      Food: sumOrNull(sites.map(s=>s.wastageByType.Food))||0,
+      Drink: sumOrNull(sites.map(s=>s.wastageByType.Drink))||0
+    };
+    // Combine every site's item-level wastage into one cross-site list, then apply the same
+    // "worth flagging" rule as each site tab: value over £15, or wasted more than once across
+    // the group this week (each site's own occurrence count rolls up together here).
+    const groupWastageHighlights = (() => {
+      const agg = {};
+      sites.forEach(s => (s.wastageItems||[]).forEach(({item,value,count}) => {
+        agg[item] = agg[item] || { item, value: 0, count: 0 };
+        agg[item].value += value;
+        agg[item].count += (count||1);
+      }));
+      return Object.values(agg)
+        .filter(x => x.value > WASTE_HIGHLIGHT_VALUE || x.count > 1)
+        .sort((a,b)=>b.value-a.value);
+    })();
+
+    // Weighted (by review count) average across sites for a given field-pair on t.reviews.Google.
+    function weightedGoogle(avgField, countField){
+      let sumRC=0, sumC=0;
+      for (const s of sites){
+        const g = s.reviews.Google;
+        if (g && g[countField]){ sumRC += g[avgField]*g[countField]; sumC += g[countField]; }
+      }
+      return sumC ? {avg:sumRC/sumC, count:sumC} : {avg:null, count:0};
+    }
+    function weightedFavouritetable(){
+      let sumRC=0, sumC=0;
+      for (const s of sites){
+        const e = s.reviews.Favouritetable;
+        if (e && e.count){ sumRC += e.avg*e.count; sumC += e.count; }
+      }
+      return sumC ? {avg:sumRC/sumC, count:sumC} : {avg:null, count:0};
+    }
+    const groupReviews = {};
+    {
+      const week = weightedGoogle('weekAvg','weekCount');
+      const mtd = weightedGoogle('mtdAvg','mtdCount');
+      // Shift %s can't be reweighted from already-averaged data, so use the simple mean of each
+      // site's own shift (only where that site actually has a prior-period figure to compare).
+      const weekShifts = sites.map(s=>s.reviews.Google.weekShiftPct).filter(v=>v!=null);
+      const mtdShifts = sites.map(s=>s.reviews.Google.mtdShiftPct).filter(v=>v!=null);
+      groupReviews.Google = {
+        weekAvg: week.avg, weekCount: week.count,
+        weekShiftPct: weekShifts.length ? weekShifts.reduce((a,b)=>a+b,0)/weekShifts.length : null,
+        mtdAvg: mtd.avg, mtdCount: mtd.count,
+        mtdShiftPct: mtdShifts.length ? mtdShifts.reduce((a,b)=>a+b,0)/mtdShifts.length : null
+      };
+      const ft = weightedFavouritetable();
+      groupReviews.Favouritetable = { avg: ft.avg, count: ft.count, static: true, captured: FAVOURITETABLE_CAPTURED };
+    }
+    groupReviews.negative = sites.flatMap(s => (s.reviews.negative||[]).map(r => Object.assign({site:s.name}, r)))
+      .sort((a,b)=> (a.date<b.date?1:-1)).slice(0, 12);
+
+    const group = {
+      name: 'All Sites',
+      sales: groupSales, forecast: groupForecast, prior: groupPrior, ly: groupLY,
+      labor: groupLabor, plannedLabor: groupPlannedLabor, wastage: groupWastage, discounts: groupDiscounts,
+      target: null, halfTarget: null,
+      vsForecastPct: (groupSales!=null && groupForecast) ? ((groupSales-groupForecast)/groupForecast*100) : null,
+      vsPriorPct: (groupSales!=null && groupPrior) ? ((groupSales-groupPrior)/groupPrior*100) : null,
+      vsLYPct: (groupSales!=null && groupLY) ? ((groupSales-groupLY)/groupLY*100) : null,
+      actualLaborPct: (groupLabor!=null && groupSales) ? (groupLabor/groupSales*100) : null,
+      forecastLaborPct: (groupPlannedLabor!=null && groupForecast) ? (groupPlannedLabor/groupForecast*100) : null,
+      fohAmt: groupFOH||0, bohAmt: groupBOH||0,
+      fohPct: (groupSales && groupFOH!=null) ? (groupFOH/groupSales*100) : null,
+      bohPct: (groupSales && groupBOH!=null) ? (groupBOH/groupSales*100) : null,
+      otherPct: (groupSales && groupOther) ? (groupOther/groupSales*100) : 0,
+      wastagePct: (groupWastage!=null && groupSales) ? (groupWastage/groupSales*100) : null,
+      discountPct: (groupDiscounts!=null && groupSales) ? (groupDiscounts/groupSales*100) : null,
+      discountSplit: { discount: groupDiscountTypeD||0, comp: groupDiscountTypeC||0, types: {} },
+      purchases: groupPurchases,
+      totalPurchases: groupTotalPurchases,
+      wastageByType: groupWastageByType,
+      // STATIC SNAPSHOT: no category-level wastage, so this uses the real raw group wastage total
+      // (groupWastage) rather than a Food+Drink sum.
+      wastagePctOfPurchases: (groupTotalPurchases && groupWastage!=null) ? (groupWastage/groupTotalPurchases*100) : null,
+      wastageFlag: null,
+      wastageHighlights: groupWastageHighlights,
+      logs: (logsRes.results||[]),
+      currentWeek: {
+        plannedLabor: groupPlannedLaborCW, forecast: groupForecastCW,
+        plannedLaborPct: (groupPlannedLaborCW!=null && groupForecastCW) ? (groupPlannedLaborCW/groupForecastCW*100) : null
+      },
+      nextWeek: {
+        plannedLabor: groupPlannedLaborNW, forecast: groupForecastNW,
+        plannedLaborPct: (groupPlannedLaborNW!=null && groupForecastNW) ? (groupPlannedLaborNW/groupForecastNW*100) : null
+      },
+      reviews: groupReviews,
+      isGroup: true,
+      siteRows: sites
+    };
+
+    const overviewTab = { name: 'Month To Date', isOverview: true, mtdStats, siteNames };
+
+    RANGE.mtdLabel = mtdLabel;
+    RANGE.mtdPriorLabel = mtdPriorLabel;
+
+    statusPill.textContent = 'Static Snapshot · captured '+STATIC_CAPTURED_LABEL;
+    statusPill.classList.remove('live');
+
+    // ---------------- render ----------------
+    const allTabs = [group, overviewTab, ...sites];
+    tabsEl.innerHTML = '';
+    allTabs.forEach((t, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'tab-btn' + (t.isGroup ? ' group-tab' : '') + (i===0 ? ' active' : '');
+      btn.textContent = t.isOverview ? 'Month To Date' : (t.isGroup ? 'All Sites' : t.name);
+      btn.dataset.idx = i;
+      btn.addEventListener('click', () => activateTab(i));
+      tabsEl.appendChild(btn);
+    });
+
+    content.innerHTML = '';
+    if (errors.length){
+      const banner = document.createElement('div');
+      banner.className = 'err-banner';
+      banner.textContent = 'Some data could not be loaded: ' + errors.join(' | ');
+      content.appendChild(banner);
+    }
+    allTabs.forEach((t, i) => {
+      const panel = document.createElement('div');
+      panel.className = 'panel' + (i===0 ? ' active' : '');
+      panel.id = 'panel-'+i;
+      panel.innerHTML = renderPanel(t, RANGE, CCY);
+      content.appendChild(panel);
+    });
+
+    // group summary table + per-site lazy tables (discount breakdown)
+    renderGroupTable(group, sites);
+    initTablesFor(0, allTabs);
+
+    function activateTab(i){
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.idx)===i));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-'+i).classList.add('active');
+      initTablesFor(i, allTabs);
+    }
+  }
+
+  function pctCard(label, value, opts){
+    opts = opts||{};
+    const cls = value==null ? '' : (opts.invert ? deltaClass(-value) : deltaClass(value));
+    const colorCls = value==null ? '' : (cls==='pos'?'mint':cls==='neg'?'red':'');
+    return '<div class="card"><div class="label">'+label+'</div><div class="value '+colorCls+'">'+fmtSignedPct(value)+'</div></div>';
+  }
+
+  function ragCard(label, valueStr, ragCls, caption, amountStr){
+    return '<div class="card '+ragCls+'"><div class="label">'+label+'</div><div class="value">'+valueStr+'</div>'
+      + (amountStr ? '<div class="delta flat">'+amountStr+'</div>' : '')
+      + (caption ? '<div class="rag-caption">'+caption+'</div>' : '') + '</div>';
+  }
+
+  function renderPanel(t, RANGE, ccy){
+    if (t.isOverview) return renderOverviewPanel(t);
+
+    const isGroup = !!t.isGroup;
+    const fVsForecast = deltaClass(t.vsForecastPct);
+    const fVsPrior = deltaClass(t.vsPriorPct);
+    const fVsLY = deltaClass(t.vsLYPct);
+
+    let html = '';
+
+    html += '<div class="section"><div class="section-title">Revenue &mdash; last week ('+RANGE.last.s+' to '+RANGE.last.e+')</div>';
+    html += '<div class="card-grid">';
+    html += '<div class="card"><div class="label">Forecasted Revenue</div><div class="value">'+fmtMoney(t.forecast)+'</div></div>';
+    html += '<div class="card"><div class="label">Actual Revenue</div><div class="value mint">'+fmtMoney(t.sales)+'</div></div>';
+    html += cardWithDelta('vs Forecast', t.vsForecastPct, fVsForecast);
+    html += cardWithDelta('vs Prior Week', t.vsPriorPct, fVsPrior);
+    html += cardWithDelta('vs Same Week LY', t.vsLYPct, fVsLY);
+    html += '</div></div>';
+
+    // ---- Labour — Last Week (actual, RAG vs target, £ shown alongside every %) ----
+    html += '<div class="section"><div class="section-title">Labour &mdash; Last Week</div>';
+    html += '<div class="card-grid">';
+    html += ragCard('Forecasted Labour %', fmtPct(t.forecastLaborPct), '', t.target!=null?('Target &le;'+t.target+'%'):'', fmtMoney(t.plannedLabor));
+    html += ragCard('Actual Labour %', fmtPct(t.actualLaborPct), ragClass(t.actualLaborPct, t.target), t.target!=null?('Target &le;'+t.target+'%'):'', fmtMoney(t.labor));
+    html += ragCard('FOH Labour %', fmtPct(t.fohPct), ragClass(t.fohPct, t.halfTarget), t.halfTarget!=null?('Target &le;'+t.halfTarget.toFixed(1)+'%'):'', fmtMoney(t.fohAmt));
+    html += ragCard('BOH Labour %', fmtPct(t.bohPct), ragClass(t.bohPct, t.halfTarget), t.halfTarget!=null?('Target &le;'+t.halfTarget.toFixed(1)+'%'):'', fmtMoney(t.bohAmt));
+    html += '</div></div>';
+
+    // ---- Current Week / Next Week — Planned, and Discounts & Comps: per-site only ----
+    // (All Sites already shows last week's actuals + the focus summary below; these forward-look
+    // and discount details are more useful drilled into a single site than blended across 12.)
+    if (!isGroup){
+      html += '<div class="section"><div class="section-title">Current Week &mdash; Planned ('+RANGE.currentWeek.s+' to '+RANGE.currentWeek.e+')</div>';
+      html += '<div class="card-grid">';
+      html += '<div class="card"><div class="label">Planned Labour Cost</div><div class="value">'+fmtMoney(t.currentWeek.plannedLabor)+'</div></div>';
+      html += '<div class="card"><div class="label">Forecasted Sales</div><div class="value">'+fmtMoney(t.currentWeek.forecast)+'</div></div>';
+      html += ragCard('Planned Labour % of Sales', fmtPct(t.currentWeek.plannedLaborPct), ragClass(t.currentWeek.plannedLaborPct, t.target), t.target!=null?('Target &le;'+t.target+'%'):'');
+      html += '</div></div>';
+
+      html += '<div class="section"><div class="section-title">Next Week &mdash; Planned ('+RANGE.nextWeek.s+' to '+RANGE.nextWeek.e+')</div>';
+      html += '<div class="card-grid">';
+      html += '<div class="card"><div class="label">Planned Labour Cost</div><div class="value">'+fmtMoney(t.nextWeek.plannedLabor)+'</div></div>';
+      html += '<div class="card"><div class="label">Forecasted Sales</div><div class="value">'+fmtMoney(t.nextWeek.forecast)+'</div></div>';
+      html += ragCard('Planned Labour % of Sales', fmtPct(t.nextWeek.plannedLaborPct), ragClass(t.nextWeek.plannedLaborPct, t.target), t.target!=null?('Target &le;'+t.target+'%'):'');
+      html += '</div></div>';
+
+      html += '<div class="section"><div class="section-title">Discounts &amp; Comps</div>';
+      html += '<div class="card-grid">';
+      html += '<div class="card"><div class="label">Total Discounts &amp; Comps</div><div class="value amber">'+fmtMoney(t.discounts)+'</div></div>';
+      html += '<div class="card"><div class="label">of which Discounts</div><div class="value">'+fmtMoney(t.discountSplit.discount)+'</div></div>';
+      html += '<div class="card"><div class="label">of which Comps/Complaints</div><div class="value">'+fmtMoney(t.discountSplit.comp)+'</div></div>';
+      html += '<div class="card"><div class="label">% of Revenue</div><div class="value">'+fmtPct(t.discountPct)+'</div></div>';
+      html += '</div>';
+      if (t.discountSplit.types && Object.keys(t.discountSplit.types).length){
+        html += '<div style="margin-top:12px;" id="discount-table-'+safeId(t.name)+'"></div>';
+      }
+      html += '</div>';
+    }
+
+    // ---- Purchases & Wastage (last week) ----
+    html += '<div class="section"><div class="section-title">Purchases &amp; Wastage</div>';
+    html += '<div class="section-subtitle">Last week (' +RANGE.last.s+' to '+RANGE.last.e+') &mdash; inventory purchases by category, and wastage as a share of revenue and of purchases</div>';
+    html += '<div class="card-grid">';
+    html += '<div class="card"><div class="label">Total Purchases</div><div class="value">'+fmtMoney(t.totalPurchases)+'</div>'
+      + '<div class="rag-caption">Food + Drink + Consumables + Oil, net of Waste Oil ('+fmtMoney(t.purchases.WasteOil)+')</div></div>';
+    html += '<div class="card"><div class="label">Food Purchases</div><div class="value">'+fmtMoney(t.purchases.Food)+'</div></div>';
+    html += '<div class="card"><div class="label">Drink Purchases</div><div class="value">'+fmtMoney(t.purchases.Drink)+'</div></div>';
+    html += '<div class="card"><div class="label">Oil Purchases</div><div class="value">'+fmtMoney(t.purchases.Oil)+'</div>'
+      + '<div class="rag-caption">Waste Oil: '+fmtMoney(t.purchases.WasteOil)+'</div></div>';
+    html += '<div class="card"><div class="label">Consumables Purchases</div><div class="value">'+fmtMoney(t.purchases.Consumables)+'</div>'
+      + '<div class="rag-caption">Mac: '+fmtMoney(t.purchases.Mac)+' &middot; Crosbys: '+fmtMoney(t.purchases.Crosbys)+'</div></div>';
+    html += '</div>';
+    html += '<div class="card-grid" style="margin-top:12px;">';
+    html += '<div class="card'+(t.wastageFlag?' rag-bad':'')+'"><div class="label">Total Wastage</div><div class="value red">'+fmtMoney(t.wastage)+'</div>'
+      + '<div class="rag-caption">'+fmtPct(t.wastagePct)+' of revenue &middot; '+fmtPct(t.wastagePctOfPurchases)+' of total purchases</div></div>';
+    html += '</div>';
+    if (t.wastageFlag==='zero' || t.wastageFlag==='high'){
+      html += '<div class="section-subtitle" style="margin-top:14px;">';
+      if (t.wastageFlag==='zero') html += '<b style="color:var(--red)">Flag:</b> no wastage logged despite '+fmtMoney(t.totalPurchases)+' of purchases &mdash; worth checking whether wastage is actually being recorded here.';
+      if (t.wastageFlag==='high') html += '<b style="color:var(--red)">Flag:</b> wastage is unusually high relative to purchases versus the group average &mdash; worth checking for mis-keyed or duplicated entries.';
+      html += '</div>';
+    }
+    // STATIC SNAPSHOT: the Food/Drink wastage split and the item-level "Wastage Worth Flagging"
+    // breakdown both need category- or product-level Tenzo queries that this frozen export
+    // deliberately leaves out (see the note in loadDashboard). Total Wastage above is real data;
+    // this note replaces the breakdown that the live dashboard shows underneath it.
+    html += '<div class="section-subtitle" style="margin-top:14px;">Category and product-level wastage breakdown (Food/Drink split, "Wastage Worth Flagging") is not included in this static snapshot &mdash; see the live dashboard for the full breakdown.</div>';
+    html += '</div>';
+
+    // ---- Reviews: per-site only (All Sites drops this — see the focus summary instead) ----
+    if (!isGroup){
+      html += '<div class="section"><div class="section-title">Reviews &mdash; Google &amp; Favouritetable</div>';
+      html += '<div class="section-subtitle">Favouritetable has no live API &mdash; rating captured manually on '+FAVOURITETABLE_CAPTURED+', so no weekly/monthly trend is available for it.</div>';
+      html += '<div class="card-grid">';
+      {
+        const rv = t.reviews.Google || {};
+        const weekCls = rv.weekShiftPct==null ? 'flat' : (rv.weekShiftPct>0?'pos':(rv.weekShiftPct<0?'neg':'flat'));
+        const mtdCls = rv.mtdShiftPct==null ? 'flat' : (rv.mtdShiftPct>0?'pos':(rv.mtdShiftPct<0?'neg':'flat'));
+        html += '<div class="card"><div class="label">Google &mdash; Last Week</div><div class="value">'+fmtRating(rv.weekAvg)+'</div>'
+          + '<div class="delta '+weekCls+'">'+(rv.weekShiftPct==null?'No prior-week data':fmtSignedPct(rv.weekShiftPct)+' shift vs prior week')+' &middot; '+(rv.weekCount||0)+' review'+(rv.weekCount===1?'':'s')+'</div></div>';
+        html += '<div class="card"><div class="label">Google &mdash; '+RANGE.mtdLabel+' vs '+RANGE.mtdPriorLabel+'</div><div class="value">'+fmtRating(rv.mtdAvg)+'</div>'
+          + '<div class="delta '+mtdCls+'">'+(rv.mtdShiftPct==null?'No prior-month data':fmtSignedPct(rv.mtdShiftPct)+' vs '+RANGE.mtdPriorLabel)+' &middot; '+(rv.mtdCount||0)+' review'+(rv.mtdCount===1?'':'s')+'</div></div>';
+        const ft = t.reviews.Favouritetable || {avg:null,count:0};
+        const ftLow = ft.avg!=null && ft.avg < 4.0;
+        html += '<div class="card'+(ftLow?' rag-bad':'')+'"><div class="label">Favouritetable &mdash; Rating</div><div class="value">'+fmtRating(ft.avg)+'</div>'
+          + '<div class="delta flat">Captured '+FAVOURITETABLE_CAPTURED+' &middot; '+ft.count+' review'+(ft.count===1?'':'s')+(ftLow?' &middot; below 4.0 &mdash; worth a look':'')+'</div></div>';
+      }
+      html += '</div>';
+      html += '<div style="margin-top:16px;">';
+      html += '<div class="section-title" style="font-size:10px;">Negative Reviews (&le;3&#9733; on Google) &mdash; week of '+RANGE.last.s+'</div>';
+      const neg = t.reviews.negative || [];
+      if (neg.length){
+        for (const r of neg){
+          html += '<div class="review-card negative"><div class="review-meta">'
+            + '<span class="platform-badge">'+r.platform+'</span>'
+            + '<span class="stars">'+fmtStars(r.rating)+'</span>'
+            + '<span>'+(r.name||'Guest')+'</span>'
+            + '<span>'+(r.date? String(r.date).slice(0,10) : '')+'</span>'
+            + '</div><div class="review-text">'+escapeHtml(r.text)+'</div></div>';
+        }
+      } else {
+        html += '<div class="no-reviews">No negative reviews (3&#9733; or below) with comments were logged for this site this week.</div>';
+      }
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+    }
+
+    // Log Reports: per-site only — All Sites dropped this (12 sites' worth of full log text was
+    // too much to be useful blended together; drill into a site tab to read them).
+    if (!isGroup){
+      html += '<div class="section"><div class="section-title">Log Reports &mdash; week of '+RANGE.last.s+'</div>';
+      if (t.logs && t.logs.length){
+        for (const l of t.logs){
+          html += '<div class="log-entry"><div class="log-meta"><span><b>'+ (l.location_name||'') +'</b></span><span>'+ (l.logbook_name||'Log') +'</span><span>'+ (l.date_of_business||'') +'</span><span>'+ (l.author||'') +'</span></div>';
+          const sections = (l.full_text && l.full_text.full_text) || [];
+          for (const sec of sections){
+            for (const f of (sec.section_content||[])){
+              if (!f.field_value) continue;
+              html += '<div class="log-field"><span class="fname">'+f.field_name+':</span> '+escapeHtml(String(f.field_value))+'</div>';
+            }
+          }
+        }
+      } else {
+        html += '<div class="no-logs">No log reports were submitted for this site during this week. Flag with the GM to ensure the Weekly Site Report is logged going forward.</div>';
+      }
+      html += '</div>';
+    }
+
+    if (isGroup){
+      html += '<div class="section"><div class="section-title">All Sites Last Week</div><div id="group-table"></div></div>';
+      html += '<div class="section"><div class="section-title">Summary &amp; Where Focus Is Needed</div>';
+      html += '<div class="summary-box">'+buildSummary(t)+' '+buildGroupFocusSummary(t.siteRows)+'</div></div>';
+    } else {
+      html += '<div class="section"><div class="section-title">Summary &amp; Where Staff Need To Focus</div>';
+      html += '<div class="summary-box">'+buildSummary(t)+'</div></div>';
+    }
+
+    return html;
+  }
+
+  function buildGroupFocusSummary(sites){
+    const laborOver = sites.filter(s=>s.target!=null && s.actualLaborPct!=null && s.actualLaborPct > s.target+0.3)
+      .sort((a,b)=>(b.actualLaborPct-b.target)-(a.actualLaborPct-a.target));
+    const wastageHigh = sites.filter(s=>s.wastageFlag==='high');
+    const wastageZero = sites.filter(s=>s.wastageFlag==='zero');
+    const discountHigh = sites.filter(s=>s.discountPct!=null && s.discountPct>1.5).sort((a,b)=>b.discountPct-a.discountPct);
+    const negReviewSites = sites.filter(s=>(s.reviews.negative||[]).length>0).sort((a,b)=>(b.reviews.negative.length)-(a.reviews.negative.length));
+    const lowFavourite = sites.filter(s=>s.reviews.Favouritetable && s.reviews.Favouritetable.avg!=null && s.reviews.Favouritetable.avg < 4.0);
+    const googleDown = sites.filter(s=>s.reviews.Google && s.reviews.Google.mtdShiftPct!=null && s.reviews.Google.mtdShiftPct <= -3);
+    const missingLogs = sites.filter(s=>!s.logs || !s.logs.length);
+
+    const parts = [];
+    if (laborOver.length) parts.push('<b>Labour over target:</b> '+laborOver.map(s=>s.name+' ('+fmtPct(s.actualLaborPct)+' vs '+s.target+'% target)').join(', ')+'.');
+    if (wastageHigh.length) parts.push('<b>Wastage needs checking:</b> '+wastageHigh.map(s=>s.name).join(', ')+' &mdash; unusually high wastage relative to purchases versus the group average, worth checking for mis-keyed or duplicated entries.');
+    if (wastageZero.length) parts.push('<b>Possible under-recording:</b> '+wastageZero.map(s=>s.name).join(', ')+' logged no wastage despite meaningful purchase volume &mdash; confirm wastage is actually being recorded.');
+    if (discountHigh.length) parts.push('<b>Discounts/comps elevated:</b> '+discountHigh.map(s=>s.name+' ('+fmtPct(s.discountPct)+')').join(', ')+'.');
+    if (negReviewSites.length) parts.push('<b>Negative Google reviews this week:</b> '+negReviewSites.map(s=>s.name+' ('+s.reviews.negative.length+')').join(', ')+' &mdash; worth a manager follow-up.');
+    if (lowFavourite.length) parts.push('<b>Favouritetable rating below 4.0:</b> '+lowFavourite.map(s=>s.name+' ('+fmtRating(s.reviews.Favouritetable.avg)+')').join(', ')+'.');
+    if (googleDown.length) parts.push('<b>Google score trending down:</b> '+googleDown.map(s=>s.name).join(', ')+' (month-to-date vs the same period last month).');
+    if (missingLogs.length) parts.push('<b>Missing log reports:</b> '+missingLogs.map(s=>s.name).join(', ')+' did not submit a Weekly Site Report.');
+    if (!parts.length) parts.push('No major outliers this week &mdash; all sites are broadly within target across labour, wastage, discounts and reviews.');
+    return parts.join(' ');
+  }
+
+  // Month To Date: same card-per-site language used on the site tabs (not a spreadsheet-style
+  // grid) — one stat-card per location. Quarter/Year To Date were removed (not just hidden) to
+  // cut down the number of Tenzo calls fired on every load, which was tripping the rate limit.
+  function renderOverviewPanel(t){
+    let html = '';
+    html += '<div class="section"><div class="section-title">Month To Date</div>';
+    html += '<div class="section-subtitle">Actual revenue, labour cost (&pound; and %), and total purchases, live from Tenzo. This static snapshot shows Total Purchases only for Month To Date &mdash; the live dashboard also splits this by Food / Drink / Consumables / Oil.</div></div>';
+    html += '<div class="section"><div class="stat-card-grid">';
+    for (const name of t.siteNames){
+      const s = t.mtdStats[name] || {};
+      html += '<div class="stat-card">';
+      html += '<div class="stat-name">'+escapeHtml(name)+'</div>';
+      html += statRow('Revenue', fmtMoney(s.sales));
+      html += statRow('Labour', fmtMoney(s.labor)+' ('+fmtPct(s.laborPct)+')');
+      html += statRow('Total Purchases', fmtMoney(s.totalPurchases));
+      html += '</div>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function statRow(label, value){
+    return '<div class="stat-row"><span class="stat-label">'+label+'</span><span class="stat-value">'+value+'</span></div>';
+  }
+
+  function cardWithDelta(label, value, cls){
+    const colorCls = cls==='pos'?'mint':cls==='neg'?'red':'';
+    return '<div class="card"><div class="label">'+label+'</div><div class="value '+colorCls+'">'+fmtSignedPct(value)+'</div></div>';
+  }
+
+  function safeId(s){ return String(s).replace(/[^a-z0-9]/gi,'_'); }
+  function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function buildSummary(t){
+    const parts = [];
+    const nm = t.isGroup ? 'Across the group' : t.name;
+
+    if (t.vsForecastPct!=null){
+      if (t.vsForecastPct >= 2) parts.push(nm+' beat forecast by <b>'+fmtSignedPct(t.vsForecastPct)+'</b> ('+fmtMoney(t.sales)+' vs '+fmtMoney(t.forecast)+' forecast).');
+      else if (t.vsForecastPct <= -2) parts.push(nm+' missed forecast by <b>'+fmtSignedPct(t.vsForecastPct)+'</b> ('+fmtMoney(t.sales)+' vs '+fmtMoney(t.forecast)+' forecast) &mdash; worth reviewing what drove the shortfall.');
+      else parts.push(nm+' landed close to forecast ('+fmtMoney(t.sales)+' vs '+fmtMoney(t.forecast)+').');
+    }
+    if (t.vsPriorPct!=null && t.vsLYPct!=null){
+      const trendWord = t.vsPriorPct >=0 ? 'up' : 'down';
+      const lyWord = t.vsLYPct >=0 ? 'up' : 'down';
+      parts.push('Sales were '+trendWord+' '+fmtPct(Math.abs(t.vsPriorPct))+' on the prior week and '+lyWord+' '+fmtPct(Math.abs(t.vsLYPct))+' versus the same week last year.');
+    } else if (t.vsPriorPct!=null){
+      parts.push('Sales were '+(t.vsPriorPct>=0?'up':'down')+' '+fmtPct(Math.abs(t.vsPriorPct))+' on the prior week.');
+    }
+
+    if (t.actualLaborPct!=null && t.target!=null){
+      const diff = t.actualLaborPct - t.target;
+      if (diff > 0.3) parts.push('Labour ran <b>'+diff.toFixed(1)+'pts above the '+t.target+'% target</b> ('+fmtPct(t.actualLaborPct)+' actual) &mdash; '+(t.fohPct>t.bohPct? 'FOH':'BOH')+' carried the larger share ('+fmtPct(t.fohPct)+' FOH / '+fmtPct(t.bohPct)+' BOH) and rotas should be tightened against trade next week.');
+      else parts.push('Labour stayed at or under the '+t.target+'% target at '+fmtPct(t.actualLaborPct)+' ('+fmtPct(t.fohPct)+' FOH / '+fmtPct(t.bohPct)+' BOH).');
+    } else if (t.actualLaborPct!=null && t.forecastLaborPct!=null){
+      const diff = t.actualLaborPct - t.forecastLaborPct;
+      if (diff > 0.5) parts.push('Labour ran <b>'+diff.toFixed(1)+'pts over plan</b> ('+fmtPct(t.actualLaborPct)+' actual vs '+fmtPct(t.forecastLaborPct)+' forecast) &mdash; '+(t.fohPct>t.bohPct? 'FOH':'BOH')+' carried the larger share ('+fmtPct(t.fohPct)+' FOH / '+fmtPct(t.bohPct)+' BOH) and rotas should be tightened against trade next week.');
+      else if (diff < -0.5) parts.push('Labour ran under plan ('+fmtPct(t.actualLaborPct)+' actual vs '+fmtPct(t.forecastLaborPct)+' forecast), split '+fmtPct(t.fohPct)+' FOH / '+fmtPct(t.bohPct)+' BOH.');
+      else parts.push('Labour ran to plan at '+fmtPct(t.actualLaborPct)+' ('+fmtPct(t.fohPct)+' FOH / '+fmtPct(t.bohPct)+' BOH).');
+    }
+
+    if (t.nextWeek && t.nextWeek.plannedLaborPct!=null && t.target!=null && t.nextWeek.plannedLaborPct > t.target + 0.3){
+      parts.push('Next week\'s rota is currently planned <b>'+(t.nextWeek.plannedLaborPct-t.target).toFixed(1)+'pts above target</b> ('+fmtPct(t.nextWeek.plannedLaborPct)+' planned) &mdash; worth trimming hours against the forecast before the week starts.');
+    }
+
+    if (t.discountPct!=null){
+      if (t.discountPct > 1.5) parts.push('Discounts &amp; comps reached <b>'+fmtPct(t.discountPct)+'</b> of revenue ('+fmtMoney(t.discounts)+') &mdash; managers should review the drivers, particularly complaint-led comps, with the team.');
+      else parts.push('Discounts &amp; comps stayed contained at '+fmtPct(t.discountPct)+' of revenue.');
+    }
+
+    if (t.wastagePct!=null){
+      if (t.wastagePct > 0.6) parts.push('Wastage was elevated at <b>'+fmtPct(t.wastagePct)+'</b> of revenue ('+fmtMoney(t.wastage)+') &mdash; a focus area for kitchen prep and stock control next week.');
+      else parts.push('Wastage was under control at '+fmtPct(t.wastagePct)+' of revenue ('+fmtMoney(t.wastage)+').');
+    }
+
+    if (t.reviews){
+      const negCount = (t.reviews.negative||[]).length;
+      if (negCount > 0){
+        parts.push('<b>'+negCount+' negative review'+(negCount===1?'':'s')+' (3&#9733; or below)</b> came in this week &mdash; worth a manager follow-up on the specific complaints raised.');
+      }
+      const g = t.reviews.Google, ft = t.reviews.Favouritetable;
+      if (g && g.weekShiftPct!=null && g.weekShiftPct <= -3) parts.push('Google score shifted down '+fmtPct(Math.abs(g.weekShiftPct))+' this week.');
+      if (g && g.mtdShiftPct!=null && g.mtdShiftPct <= -3) parts.push('Google score is trending down '+fmtPct(Math.abs(g.mtdShiftPct))+' month-to-date vs the same period last month.');
+      if (ft && ft.avg!=null && ft.avg < 4.0) parts.push('Favouritetable rating sits at '+fmtRating(ft.avg)+', below the 4.0 watch line.');
+    }
+
+    if (!t.logs || !t.logs.length){
+      parts.push((t.isGroup ? 'No sites logged a Weekly Site Report' : 'No Weekly Site Report was logged') +' this week &mdash; chase submission so revenue, labour and waste explanations are captured going forward.');
+    }
+
+    return parts.join(' ');
+  }
+
+  function renderGroupTable(group, sites){
+    const el = document.getElementById('group-table');
+    if (!el || !window.gridjs) return;
+    const rows = sites.map(s => [
+      s.name,
+      fmtMoney(s.sales), fmtMoney(s.forecast),
+      fmtSignedPct(s.vsForecastPct), fmtSignedPct(s.vsPriorPct), fmtSignedPct(s.vsLYPct),
+      fmtPct(s.actualLaborPct) + (s.target!=null ? (s.actualLaborPct<=s.target? ' ✓':' ⚑') : ''),
+      fmtPct(s.currentWeek.plannedLaborPct), fmtPct(s.nextWeek.plannedLaborPct),
+      fmtPct(s.wastagePct)
+    ]);
+    new gridjs.Grid({
+      columns: ['Site','Actual Rev','Forecast Rev','vs Forecast','vs Prior Wk','vs LY','Labour % (Actual)','This Wk Labour % (Plan)','Next Wk Labour % (Plan)','Wastage %'],
+      data: rows,
+      sort:true,
+      search:true,
+      className: { table:'gh-grid' },
+      style: {
+        table: { 'font-family':'inherit', 'font-size':'12px', background:'#161616', color:'#f4f4f4' },
+        th: { background:'#1e1e1e', color:'#9c9c9c', 'border':'1px solid #2b2b2b' },
+        td: { background:'#161616', 'border':'1px solid #1c1c1c' }
+      }
+    }).render(el);
+  }
+
+  function renderDiscountTable(t){
+    const el = document.getElementById('discount-table-'+safeId(t.name));
+    if (!el || !window.gridjs) return;
+    const rows = Object.entries(t.discountSplit.types).sort((a,b)=>b[1]-a[1]).map(([k,v]) => [k, fmtMoney(v), classifyDiscount(k)==='comp'?'Comp/Complaint':'Discount']);
+    new gridjs.Grid({
+      columns: ['Type','Amount','Category'],
+      data: rows,
+      sort:true,
+      style: {
+        table: { 'font-family':'inherit', 'font-size':'12px', background:'#161616', color:'#f4f4f4' },
+        th: { background:'#1e1e1e', color:'#9c9c9c', border:'1px solid #2b2b2b' },
+        td: { background:'#161616', border:'1px solid #1c1c1c' }
+      }
+    }).render(el);
+  }
+
+  function initTablesFor(idx, allTabs){
+    const t = allTabs[idx];
+    if (!t) return;
+
+    if (t.isGroup){
+      const tableEl = document.getElementById('group-table');
+      if (tableEl && !tableEl.dataset.rendered){ tableEl.dataset.rendered='1'; renderGroupTable(t, t.siteRows); }
+    } else if (t.isOverview){
+      // Year To Dates is plain card HTML (see renderOverviewPanel) — no lazy table to init.
+    } else {
+      const discEl = document.getElementById('discount-table-'+safeId(t.name));
+      if (discEl && !discEl.dataset.rendered){ discEl.dataset.rendered='1'; renderDiscountTable(t); }
+    }
+  }
+
+  loadDashboard();
+
+})();
+</script>
+</body>
+</html>
